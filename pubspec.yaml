@@ -1,3 +1,4 @@
 name: okoboji
 dependencies:
   bot: '>=0.16.1'
+  pathos: '>=0.4.3+1'

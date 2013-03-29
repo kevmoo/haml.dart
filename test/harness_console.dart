@@ -2,6 +2,7 @@ library harness_console;
 
 import 'package:unittest/unittest.dart';
 import 'package:unittest/vm_config.dart';
+import 'haml/haml_test.dart' as haml;
 
 main() {
   final config = new VMConfiguration();
@@ -12,7 +13,6 @@ void testCore(Configuration config) {
   configure(config);
   groupSep = ' - ';
 
-  test('tbd', () {
-    expect(true, isTrue);
-  });
+  haml.main();
+
 }
