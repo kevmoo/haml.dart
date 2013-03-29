@@ -1,0 +1,3 @@
+name: okoboji
+dependencies:
+  bot: '>=0.16.1'
