@@ -18,6 +18,14 @@ const _tempJsonContent = '''
       "haml" : "%p",
       "html" : "<p></p>"
     }
+  },
+
+  "tags with inline content" : {
+
+    "Inline content simple tag" : {
+      "haml" : "%p hello",
+      "html" : "<p>hello</p>"
+    }
   }
 }
 ''';
@@ -30,26 +38,23 @@ void main() {
 
   final Map<String, Map> jsonValue = json.parse(_tempJsonContent);
 
+  jsonValue.forEach((groupName, Map<String, Map> testMap) {
+    group(groupName, () {
 
+      testMap.forEach((String testName, Map testData) {
+        final data = new _SpecData(testData);
+        if(data.skip) {
+          print('skip');
+        } else {
 
-
-  test('haml-spec', () {
-
-    jsonValue.forEach((groupName, Map<String, Map> testMap) {
-
-        testMap.forEach((String testName, Map testData) {
-          final data = new _SpecData(testData);
-          print('$groupName - $testName');
-          if(data.skip) {
-            print('skip');
-          } else {
-            print('test');
+          test(testName, () {
             _doTest(data);
-          }
-        });
-
+          });
+        }
       });
+
     });
+  });
 }
 
 void _doTest(_SpecData data) {
