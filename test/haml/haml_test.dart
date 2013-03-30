@@ -6,30 +6,56 @@ import 'dart:json' as json;
 import 'package:unittest/unittest.dart';
 import 'package:pathos/path.dart' as pathos;
 
+import 'package:okoboji/haml.dart' as haml;
+
 const _jsonTestPath = 'test/haml-spec/tests.json';
 
+const _tempJsonContent = '''
+{
+  "basic Haml tags and CSS": {
+
+    "a simple Haml tag" : {
+      "haml" : "%p",
+      "html" : "<p></p>"
+    }
+  }
+}
+''';
+
 void main() {
-  final jsonFile = new File(pathos.normalize(_jsonTestPath));
 
-  final Map<String, Map> jsonValue = json.parse(jsonFile.readAsStringSync());
+  //final jsonFile = new File(pathos.normalize(_jsonTestPath));
 
-  group('haml-spec', () {
+  //final Map<String, Map> jsonValue = json.parse(jsonFile.readAsStringSync());
+
+  final Map<String, Map> jsonValue = json.parse(_tempJsonContent);
+
+
+
+
+  test('haml-spec', () {
 
     jsonValue.forEach((groupName, Map<String, Map> testMap) {
-      group(groupName, () {
+
         testMap.forEach((String testName, Map testData) {
           final data = new _SpecData(testData);
-          if(!data.skip) {
-            test(testName, () => _doTest(data));
+          print('$groupName - $testName');
+          if(data.skip) {
+            print('skip');
+          } else {
+            print('test');
+            _doTest(data);
           }
         });
 
       });
     });
-  });
 }
 
 void _doTest(_SpecData data) {
+  final parseResult = haml.parse(data.haml);
+  expect(parseResult, equals(data.html),
+      reason: data.haml);
 }
 
 class _SpecData {
