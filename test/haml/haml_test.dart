@@ -47,8 +47,8 @@ void main() {
 }
 
 void _doTest(_SpecData data) {
-  print(data.haml);
-  print(data.html);
+  // print(data.haml);
+  // print(data.html);
   final parseResult = parse(data.haml, format: data.format);
   expect(parseResult, equals(data.html),
       reason: data.haml);

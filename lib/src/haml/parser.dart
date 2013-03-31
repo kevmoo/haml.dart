@@ -42,12 +42,11 @@ class HamlParser extends HamlGrammar {
       }
       nodes.addAll(each[1]);
 
-      print(nodes.map((n) => Error.safeToString(n)).join(', '));
+      //print(nodes.map((n) => Error.safeToString(n)).join(', '));
       return new XmlDocument(nodes);
     });
 
     action('element', (each) {
-      print(each);
       final XmlName name = each[0];
 
       Iterable<XmlNode> childNodes;
@@ -62,9 +61,6 @@ class HamlParser extends HamlGrammar {
     action('nameToken', (each) => new XmlName(each));
 
     action('doctype', (label) {
-      print('found label: $label');
-      print(format);
-
       if(format == HamlFormat.XHTML && label == 'XML') {
         return new XmlProcessing('xml', r''' version='1.0' encoding='utf-8' ''');
       }
