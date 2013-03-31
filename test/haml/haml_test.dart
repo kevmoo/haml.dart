@@ -23,24 +23,18 @@ void main() {
 
       testMap.forEach((String testName, Map testData) {
         final data = new _SpecData(testData);
-        if(data.skip) {
-          skips.add('$groupName - $testName');
-        } else {
-          test(testName, () {
-            _doTest(data);
-          });
-        }
+        test(testName, () {
+          _doTest(data);
+        });
       });
 
     });
   });
 
-  final active = ['a simple Haml tag',
-                  'Inline content simple tag', 'a tag with colons',
-                  'a tag with underscores', 'a tag with PascalCase', 'a tag with camelCase'];
+  final active = ['a simple Haml tag', 'Inline content simple tag',
+                  'a tag with colons', 'a tag with underscores',
+                  'a tag with PascalCase', 'a tag with camelCase'];
   filterTests((TestCase tc) => active.any((n) => tc.description.endsWith(n)));
-
-  print("Skips: ${skips.length}");
 }
 
 void _doTest(_SpecData data) {
@@ -52,11 +46,15 @@ void _doTest(_SpecData data) {
 class _SpecData {
   final String haml;
   final String html;
-  final bool skip;
+  final String format;
+  final bool escapeHtml;
+  final Map<String, dynamic> locals;
 
-  _SpecData.raw(this.haml, this.html, this.skip) {
+  _SpecData.raw(this.haml, this.html, this.format, this.escapeHtml,
+      this.locals) {
     assert(html != null);
     assert(haml != null);
+    assert(['html5','html4','xhtml'].contains(format));
   }
 
   factory _SpecData(Map<String, dynamic> data) {
@@ -68,17 +66,34 @@ class _SpecData {
       optional = false;
     }
 
-    final configMap = data.remove('config');
-    final localsMap = data.remove('locals');
+    //
+    // Config
+    //
+    var configMap = data.remove('config');
+    configMap = configMap == null ? {} : configMap;
 
-    final instance = new _SpecData.raw(haml, html, configMap != null || localsMap != null);
+    var format = configMap.remove('format');
+    format = format == null ? 'html5' : format;
 
-    if(!data.isEmpty) {
-      print(data);
-      throw 'missed something!';
+    var escapeHtml = configMap.remove('escape_html');
+    escapeHtml = escapeHtml == null ? 'false' : escapeHtml;
+
+    bool escapeVal;
+    if(escapeHtml == 'true') {
+      escapeVal = true;
+    } else if(escapeHtml == 'false') {
+      escapeVal = false;
+    } else {
+      throw 'huh?';
     }
 
-    return instance;
+    //
+    // Locals
+    //
+    var locals = data.remove('locals');
+    locals = locals == null ? {} : locals;
+
+    return new _SpecData.raw(haml, html, format, escapeVal, locals);
   }
 
 }
