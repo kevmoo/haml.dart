@@ -10,33 +10,13 @@ import 'package:okoboji/haml.dart' as haml;
 
 const _jsonTestPath = 'test/haml-spec/tests.json';
 
-const _tempJsonContent = '''
-{
-  "basic Haml tags and CSS": {
-
-    "a simple Haml tag" : {
-      "haml" : "%p",
-      "html" : "<p></p>"
-    }
-  },
-
-  "tags with inline content" : {
-
-    "Inline content simple tag" : {
-      "haml" : "%p hello",
-      "html" : "<p>hello</p>"
-    }
-  }
-}
-''';
-
 void main() {
 
-  //final jsonFile = new File(pathos.normalize(_jsonTestPath));
+  final jsonFile = new File(pathos.normalize(_jsonTestPath));
 
-  //final Map<String, Map> jsonValue = json.parse(jsonFile.readAsStringSync());
+  final Map<String, Map> jsonValue = json.parse(jsonFile.readAsStringSync());
 
-  final Map<String, Map> jsonValue = json.parse(_tempJsonContent);
+  final skips = [];
 
   jsonValue.forEach((groupName, Map<String, Map> testMap) {
     group(groupName, () {
@@ -44,9 +24,8 @@ void main() {
       testMap.forEach((String testName, Map testData) {
         final data = new _SpecData(testData);
         if(data.skip) {
-          print('skip');
+          skips.add('$groupName - $testName');
         } else {
-
           test(testName, () {
             _doTest(data);
           });
@@ -55,6 +34,13 @@ void main() {
 
     });
   });
+
+  final active = ['a simple Haml tag',
+                  'Inline content simple tag', 'a tag with colons',
+                  'a tag with underscores', 'a tag with PascalCase', 'a tag with camelCase'];
+  filterTests((TestCase tc) => active.any((n) => tc.description.endsWith(n)));
+
+  print("Skips: ${skips.length}");
 }
 
 void _doTest(_SpecData data) {
