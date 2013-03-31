@@ -6,7 +6,7 @@ import 'dart:json' as json;
 import 'package:unittest/unittest.dart';
 import 'package:pathos/path.dart' as pathos;
 
-import 'package:okoboji/haml.dart' as haml;
+import 'package:okoboji/haml.dart';
 
 const _jsonTestPath = 'test/haml-spec/tests.json';
 
@@ -34,11 +34,22 @@ void main() {
   final active = ['a simple Haml tag', 'Inline content simple tag',
                   'a tag with colons', 'a tag with underscores',
                   'a tag with PascalCase', 'a tag with camelCase'];
-  filterTests((TestCase tc) => active.any((n) => tc.description.endsWith(n)));
+  filterTests((TestCase tc) {
+    if(active.any((n) => tc.description.endsWith(n))) {
+      return true;
+    }
+
+    if(tc.description.contains('headers - ')) {
+      return true;
+    }
+    return false;
+  });
 }
 
 void _doTest(_SpecData data) {
-  final parseResult = haml.parse(data.haml);
+  print(data.haml);
+  print(data.html);
+  final parseResult = parse(data.haml, format: data.format);
   expect(parseResult, equals(data.html),
       reason: data.haml);
 }
@@ -46,7 +57,7 @@ void _doTest(_SpecData data) {
 class _SpecData {
   final String haml;
   final String html;
-  final String format;
+  final HamlFormat format;
   final bool escapeHtml;
   final Map<String, dynamic> locals;
 
@@ -54,14 +65,14 @@ class _SpecData {
       this.locals) {
     assert(html != null);
     assert(haml != null);
-    assert(['html5','html4','xhtml'].contains(format));
+    assert(format != null);
   }
 
   factory _SpecData(Map<String, dynamic> data) {
-    final haml = data.remove('haml');
-    final html = data.remove('html');
+    final String haml = data.remove('haml');
+    final String html = data.remove('html');
 
-    var optional = data.remove('optional');
+    bool optional = data.remove('optional');
     if(optional == null) {
       optional = false;
     }
@@ -69,13 +80,15 @@ class _SpecData {
     //
     // Config
     //
-    var configMap = data.remove('config');
+    Map configMap = data.remove('config');
     configMap = configMap == null ? {} : configMap;
 
-    var format = configMap.remove('format');
+    String format = configMap.remove('format');
     format = format == null ? 'html5' : format;
 
-    var escapeHtml = configMap.remove('escape_html');
+    final hamlFormat = HamlFormat.parse(format);
+
+    String escapeHtml = configMap.remove('escape_html');
     escapeHtml = escapeHtml == null ? 'false' : escapeHtml;
 
     bool escapeVal;
@@ -90,10 +103,10 @@ class _SpecData {
     //
     // Locals
     //
-    var locals = data.remove('locals');
+    Map locals = data.remove('locals');
     locals = locals == null ? {} : locals;
 
-    return new _SpecData.raw(haml, html, format, escapeVal, locals);
+    return new _SpecData.raw(haml, html, hamlFormat, escapeVal, locals);
   }
 
 }

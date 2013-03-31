@@ -8,7 +8,15 @@ class HamlGrammar extends CompositeParser {
   void initialize() {
     def('start', ref('document').end());
 
-    def('document', ref('element').star());
+    def('document',
+        ref('doctype').optional()
+        .seq(ref('element').star()));
+
+    def('doctype', string('!!!')
+        .seq(ref('spaces')
+            .seq(word().or(char('.')).plus().flatten())
+            .pick(1).optional())
+         .pick(-1));
 
     def('element', char('%')
         .seq(ref('nameToken'))

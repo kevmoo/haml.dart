@@ -7,8 +7,8 @@ part 'src/haml/grammar.dart';
 part 'src/haml/parser.dart';
 part 'src/haml/nodes.dart';
 
-String parse(String sourceHaml) {
-  final parser = new HamlParser();
+String parse(String sourceHaml, {HamlFormat format: HamlFormat.HTML5}) {
+  final parser = new HamlParser(format: format);
   var result = parser.parse(sourceHaml).result;
   print(result);
   return result.doFormat();
