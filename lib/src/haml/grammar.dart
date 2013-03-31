@@ -8,13 +8,12 @@ class HamlGrammar extends CompositeParser {
   void initialize() {
     def('start', ref('document').end());
 
-    def('document', ref('element').separatedBy(_newLine,
-        optionalSeparatorAtEnd: true));
+    def('document', ref('element').star());
 
     def('element', char('%')
         .seq(ref('nameToken'))
-        .pick(1)
-        .seq(ref('spaces').seq(ref('content')).pick(1).optional()));
+        .seq(ref('content').optional())
+        .permute([1,2]));
 
     def('nameToken', ref('nameStartChar')
       .seq(ref('nameStartChar').star())
@@ -26,7 +25,11 @@ class HamlGrammar extends CompositeParser {
 
     def('content', ref('inline'));
 
-    def('inline', _newLine.neg().star().flatten());
+    def('inline', ref('spaces')
+        .seq(_newLine.neg()
+            .star()
+            .flatten())
+        .pick(1));
 
   }
 
