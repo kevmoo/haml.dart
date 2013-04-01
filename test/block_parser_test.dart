@@ -150,6 +150,10 @@ void _multiRoundTrip(String name, String value) {
         _roundTrip(value, '\t'.codeUnits.single, 3);
       });
     });
+    test('prefix grammar', () {
+      final blocks = Block.getBlocks(value).toList();
+      print(Block.getPrefixedString(blocks));
+    });
   });
 }
 

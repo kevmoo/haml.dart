@@ -2,6 +2,9 @@ library block;
 
 import 'package:bot/bot.dart';
 
+final _indentUnit = '+'.codeUnits.single;
+final _undentUnit = '-'.codeUnits.single;
+
 class Block {
   final String header;
   final Sequence<Block> children;
@@ -17,6 +20,34 @@ class Block {
   bool operator ==(other) {
     return other is Block && other.header == this.header &&
         this.children.itemsEqual(other.children);
+  }
+
+  static String getPrefixedString(Iterable<Block> blocks) {
+    final buffer = new StringBuffer();
+    blocks.forEach((b) => b.writePrefixedString(buffer));
+    return buffer.toString();
+  }
+
+  void writePrefixedString(StringSink buffer) {
+    // if the header is entirely indent/undent chars, then double them
+    String val;
+    if(header.codeUnits.every((u) => u == _indentUnit)) {
+      // TODO!!
+      throw 'not impld';
+    } else if(header.codeUnits.every((u) => u == _undentUnit)) {
+      // TODO!!
+      throw 'not impld';
+    } else {
+      val = header;
+    }
+    buffer.writeln(val);
+    if(!children.isEmpty) {
+      buffer.writeCharCode(_indentUnit);
+      buffer.writeln();
+      children.forEach((b) => b.writePrefixedString(buffer));
+      buffer.writeCharCode(_undentUnit);
+      buffer.writeln();
+    }
   }
 
   static Iterable<Block> getBlocks(String source) {
