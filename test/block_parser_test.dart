@@ -8,11 +8,11 @@ void main() {
   group('block parser', () {
 
     test('block equality', () {
-      var block1 = new Block('', []);
+      var block1 = new Block('a', []);
       expect(block1, equals(block1));
       expect(block1, same(block1));
 
-      var block2 = new Block('', []);
+      var block2 = new Block('a', []);
       expect(block2, equals(block1));
       expect(block2, isNot(same(block1)));
 

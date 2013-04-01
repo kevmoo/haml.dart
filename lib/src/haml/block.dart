@@ -6,7 +6,8 @@ class Block {
 
   Block(this.header, Iterable<Block> items) :
     this.children = new ReadOnlyCollection(items) {
-    assert(header != null);
+    requireArgumentNotNullOrEmpty(header, 'header');
+    assert(!_Line.isWhite(header.codeUnits.first));
     assert(children != null);
     assert(children.every((b) => b != null));
   }
