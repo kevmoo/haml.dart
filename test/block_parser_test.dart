@@ -101,8 +101,7 @@ void main() {
         });
 
         group('roundtrip: $key', () {
-          final blocks = Block.getBlocks(value).toList();
-          _multiRoundTrip(blocks);
+          _multiRoundTrip(value);
         });
       });
     });
@@ -110,26 +109,27 @@ void main() {
 
 }
 
-void _multiRoundTrip(List<Block> blocks) {
+void _multiRoundTrip(String value) {
   test('space x 2', () {
-    _roundTrip(blocks, ' '.codeUnits.single, 2);
+    _roundTrip(value, ' '.codeUnits.single, 2);
   });
   test('space x 1', () {
-    _roundTrip(blocks, ' '.codeUnits.single, 1);
+    _roundTrip(value, ' '.codeUnits.single, 1);
   });
   test('tab x 1', () {
-    _roundTrip(blocks, '\t'.codeUnits.single, 1);
+    _roundTrip(value, '\t'.codeUnits.single, 1);
   });
   test('tab x 3', () {
-    _roundTrip(blocks, '\t'.codeUnits.single, 3);
+    _roundTrip(value, '\t'.codeUnits.single, 3);
   });
 }
 
-void _roundTrip(List<Block> blocks, int indentUnit, int indentCount) {
-  final value = Block.getString(blocks, indentUnit: indentUnit,
+void _roundTrip(String value, int indentUnit, int indentCount) {
+  final blocks = Block.getBlocks(value).toList();
+  final newValue = Block.getString(blocks, indentUnit: indentUnit,
       indentCount: indentCount);
 
-  final blockCopy = Block.getBlocks(value).toList();
+  final blockCopy = Block.getBlocks(newValue).toList();
 
   expect(blockCopy, orderedEquals(blocks));
 }
@@ -137,6 +137,21 @@ void _roundTrip(List<Block> blocks, int indentUnit, int indentCount) {
 const _valid = const {
   'empty string': '',
   'new lines': '\n\n',
+  'simple outline': '''
+1
+ 1.1
+ 1.2
+  1.2.1
+2
+3
+4
+ 4.1
+  4.1.1
+   4.1.1.1
+  4.1.2
+ 4.2
+5  
+''',
   '3 levels, with blanks': '''
 
 hello

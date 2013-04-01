@@ -258,7 +258,7 @@ class _BlockIterator extends Iterator<Block> {
 
       assert(currentLine.level == level);
 
-      final nextLine = reader.peek();
+      var nextLine = reader.peek();
 
       // if the next line is the same level, then we have a blank block
       if(nextLine == null || nextLine.level == level) {
@@ -274,6 +274,15 @@ class _BlockIterator extends Iterator<Block> {
         final childIterable = new _OnceIterable(childIterator);
 
         _current = new Block(currentLine.value, childIterable);
+
+        // child iteration has completed at this point.
+        // It's possible that the next item is at or below the current level
+        // if the next item is below the curent level, we're done here
+        nextLine = reader.peek();
+        if(nextLine != null && nextLine.level < level) {
+          _done = true;
+        }
+
         return true;
       }
       assert(nextLine.level > (level + 1));
