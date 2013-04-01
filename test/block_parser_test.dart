@@ -1,9 +1,44 @@
 library test.block_parser;
 
+import 'dart:io';
+import 'dart:json' as json;
 import 'package:unittest/unittest.dart';
+import 'package:pathos/path.dart' as pathos;
+
 import 'package:okoboji/block.dart';
 
+const _jsonTestPath = 'test/haml-spec/tests.json';
+
 void main() {
+
+  final jsonFile = new File(pathos.normalize(_jsonTestPath));
+
+  final Map<String, Map> jsonValue = json.parse(jsonFile.readAsStringSync());
+
+  group('haml samples', () {
+    jsonValue.forEach((groupName, Map<String, Map> testMap) {
+      group(groupName, () {
+
+        testMap.forEach((String key, Map testData) {
+          if(key == 'a multiply nested silent comment with inconsistent indents') {
+            // TODO: need to handle -# comments with inconsistent indents
+            return;
+          }
+
+          final String value = testData['haml'];
+          test(key, () {
+            expect(() => Block.getBlocks(value).toList(), returnsNormally);
+          });
+
+          group('$key :: roundtrip', () {
+            _multiRoundTrip(value);
+          });
+        });
+
+      });
+    });
+  });
+
   group('block parser', () {
 
     test('block equality', () {
@@ -105,7 +140,6 @@ void main() {
       });
     });
   });
-
 }
 
 void _multiRoundTrip(String value) {
