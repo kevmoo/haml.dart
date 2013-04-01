@@ -26,13 +26,8 @@ void main() {
           }
 
           final String value = testData['haml'];
-          test(key, () {
-            expect(() => Block.getBlocks(value).toList(), returnsNormally);
-          });
 
-          group('$key :: roundtrip', () {
-            _multiRoundTrip(value);
-          });
+          _multiRoundTrip(key, value);
         });
 
       });
@@ -130,30 +125,29 @@ void main() {
 
     group('valid', () {
       _valid.forEach((key, value) {
-        test(key, () {
-          expect(() => Block.getBlocks(value).toList(), returnsNormally);
-        });
-
-        group('roundtrip: $key', () {
-          _multiRoundTrip(value);
-        });
+        _multiRoundTrip(key, value);
       });
     });
   });
 }
 
-void _multiRoundTrip(String value) {
-  test('space x 2', () {
-    _roundTrip(value, ' '.codeUnits.single, 2);
+void _multiRoundTrip(String name, String value) {
+  test(name, () {
+    expect(() => Block.getBlocks(value).toList(), returnsNormally);
   });
-  test('space x 1', () {
-    _roundTrip(value, ' '.codeUnits.single, 1);
-  });
-  test('tab x 1', () {
-    _roundTrip(value, '\t'.codeUnits.single, 1);
-  });
-  test('tab x 3', () {
-    _roundTrip(value, '\t'.codeUnits.single, 3);
+  group('roundtrip: $name', () {
+    test('space x 2', () {
+      _roundTrip(value, ' '.codeUnits.single, 2);
+    });
+    test('space x 1', () {
+      _roundTrip(value, ' '.codeUnits.single, 1);
+    });
+    test('tab x 1', () {
+      _roundTrip(value, '\t'.codeUnits.single, 1);
+    });
+    test('tab x 3', () {
+      _roundTrip(value, '\t'.codeUnits.single, 3);
+    });
   });
 }
 
