@@ -94,11 +94,6 @@ class _LineIterator extends Iterator<_Line> {
       _current = _process(line);
     } while(_current != null && _current.level == null);
 
-    // if _current has an empty value and we're at the end of the reader
-    // this this is a throw-away final, empty line. Just call it done.
-    if(_current != null && _current.value.isEmpty && _reader.eof) {
-      _current = null;
-    }
     return _current != null;
   }
 
