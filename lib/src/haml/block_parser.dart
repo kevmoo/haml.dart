@@ -21,6 +21,34 @@ class Block {
 
     return new _BlockIterable(source);
   }
+
+  static String getString(Iterable<Block> blocks, {int indentUnit,
+    int indentCount: 2}) {
+    final buffer = new StringBuffer();
+    writeBlocks(buffer, blocks, indentUnit: indentUnit,
+        indentCount: indentCount);
+    return buffer.toString();
+  }
+
+  static void writeBlocks(StringSink buffer, Iterable<Block> blocks, {
+    int level: 0, int indentUnit, int indentCount: 2}) {
+    assert(level >= 0);
+    if(indentUnit == null) {
+      indentUnit = _Line._space;
+    }
+    assert(_Line.isWhite(indentUnit));
+    assert(indentCount > 0);
+
+    for(final b in blocks) {
+      for(var i = 0; i < level * indentCount; i++) {
+        buffer.writeCharCode(indentUnit);
+      }
+
+      buffer.writeln(b.header);
+      writeBlocks(buffer, b.children,
+          level: level + 1, indentUnit: indentUnit, indentCount: indentCount);
+    }
+  }
 }
 
 class _LineIterable extends Iterable<_Line> {

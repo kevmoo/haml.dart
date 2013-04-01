@@ -126,26 +126,12 @@ void _multiRoundTrip(List<Block> blocks) {
 }
 
 void _roundTrip(List<Block> blocks, int indentUnit, int indentCount) {
-  final buffer = new StringBuffer();
-  _writeBlocks(buffer, blocks, 0, indentUnit, indentCount);
+  final value = Block.getString(blocks, indentUnit: indentUnit,
+      indentCount: indentCount);
 
-  final value = buffer.toString();
   final blockCopy = Block.getBlocks(value).toList();
 
   expect(blockCopy, orderedEquals(blocks));
-}
-
-void _writeBlocks(StringBuffer buffer, Iterable<Block> blocks, int level,
-                  int indentUnit, int indentCount) {
-  for(final b in blocks) {
-    for(var i = 0; i < level * indentCount; i++) {
-      buffer.writeCharCode(indentUnit);
-    }
-
-    buffer.writeln(b.header);
-    _writeBlocks(buffer, b.children, level + 1, indentUnit, indentCount);
-
-  }
 }
 
 const _valid = const {
