@@ -132,21 +132,23 @@ void main() {
 }
 
 void _multiRoundTrip(String name, String value) {
-  test(name, () {
-    expect(() => Block.getBlocks(value).toList(), returnsNormally);
-  });
-  group('roundtrip: $name', () {
-    test('space x 2', () {
-      _roundTrip(value, ' '.codeUnits.single, 2);
+  group(name, () {
+    test('getBlocks', () {
+      expect(() => Block.getBlocks(value).toList(), returnsNormally);
     });
-    test('space x 1', () {
-      _roundTrip(value, ' '.codeUnits.single, 1);
-    });
-    test('tab x 1', () {
-      _roundTrip(value, '\t'.codeUnits.single, 1);
-    });
-    test('tab x 3', () {
-      _roundTrip(value, '\t'.codeUnits.single, 3);
+    group('roundtrip', () {
+      test('space x 2', () {
+        _roundTrip(value, ' '.codeUnits.single, 2);
+      });
+      test('space x 1', () {
+        _roundTrip(value, ' '.codeUnits.single, 1);
+      });
+      test('tab x 1', () {
+        _roundTrip(value, '\t'.codeUnits.single, 1);
+      });
+      test('tab x 3', () {
+        _roundTrip(value, '\t'.codeUnits.single, 3);
+      });
     });
   });
 }
