@@ -7,21 +7,14 @@ class HamlFormat {
 
   final String name;
 
+  static const _formats = const[HTML5, HTML4, XHTML];
+
   String toString() => 'HamlFormat $name';
 
   const HamlFormat._internal(this.name);
 
   static HamlFormat parse(String input) {
-    switch(input) {
-      case HTML5.name:
-        return HTML5;
-      case XHTML.name:
-        return XHTML;
-      case HTML4.name:
-        return HTML4;
-      default:
-        throw 'not impld for $input';
-    }
+    return _formats.singleWhere((f) => f.name == input);
   }
 }
 
@@ -78,16 +71,18 @@ class HamlParser extends HamlGrammar {
   String _getDocType(String label) {
     switch(format) {
       case HamlFormat.HTML4:
+        if(label == null)
+          return r''' html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"''';
+
         switch(label) {
           case 'strict':
             return r''' html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"''';
           case 'frameset':
             return r''' html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd"''';
-          case null:
-            return r''' html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"''';
           default:
             return null;
         }
+        break;
       case HamlFormat.XHTML:
         switch(label) {
           case 'frameset':
@@ -105,6 +100,7 @@ class HamlParser extends HamlGrammar {
           default:
             return r''' html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"''';
         }
+        break;
       default:
         switch(label) {
           case 'XML':
