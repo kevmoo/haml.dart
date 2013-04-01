@@ -1,8 +1,7 @@
 name: okoboji
 dependencies:
-  bot: '>=0.16.1'
   pathos: '>=0.4.3+1'
   logging: '>=0.4.3+5'
-  petitparser:
-    path: /Users/kevin/source/github/petitParser.dart
-
+  bot:
+    git: https://github.com/kevmoo/bot.dart.git
+  petitparser: '>=0.2.4+m4'
