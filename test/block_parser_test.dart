@@ -69,6 +69,27 @@ void main() {
       expect(blocks[1].children[0].children, isEmpty);
     });
 
+    test('3 levels', () {
+      final source = '''hello\n  hi\n    goodbye''';
+
+      final blocks = Block.getBlocks(source).toList();
+      expect(blocks, hasLength(1));
+
+      expect(blocks[0].header, equals('hello'));
+      expect(blocks[0].children, hasLength(1));
+      expect(blocks[0].children[0].header, equals('hi'));
+      expect(blocks[0].children[0].children, hasLength(1));
+      expect(blocks[0].children[0].children[0].header, equals('goodbye'));
+      expect(blocks[0].children[0].children[0].children, isEmpty);
+    });
+
+    group('invalid', () {
+      _invalid.forEach((key, value) {
+        test(key, () {
+          expect(() => Block.getBlocks(value).toList(), throws);
+        });
+      });
+    });
   });
 
 }
