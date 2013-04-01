@@ -39,13 +39,27 @@ class _LineIterator extends Iterator<_Line> {
   _Line get current => _current;
 
   _Line peek() {
-    final value = _reader.peekNextLine();
-    return _process(value);
+    // We skip blank lines. Where line.level == null
+    while(true) {
+      final value = _reader.peekNextLine();
+      final line = _process(value);
+
+      if(line == null) {
+        return null;
+      } else if(line.level == null) {
+        _reader.readNextLine();
+      } else {
+        return line;
+      }
+    }
   }
 
   bool moveNext() {
-    final line = _reader.readNextLine();
-    _current = _process(line);
+    // We skip blank lines. Where line.level == null
+    do {
+      var line = _reader.readNextLine();
+      _current = _process(line);
+    } while(_current != null && _current.level == null);
 
     // if _current has an empty value and we're at the end of the reader
     // this this is a throw-away final, empty line. Just call it done.
@@ -203,23 +217,15 @@ class _BlockIterator extends Iterator<Block> {
     assert(level > 0);
   }
 
-  bool moveNext() {
-    while(!_done && reader.moveNext()) {
-      var currentLine = reader.current;
+  Block get current => _current;
 
-      // the currentLine might be blank, which is represented by level == null
-      // so churn through lines until we get to a non-null level
-      if(currentLine.level == null) {
-        continue;
-      }
+  bool moveNext() {
+    if (!_done && reader.moveNext()) {
+      var currentLine = reader.current;
 
       assert(currentLine.level == level);
 
-      var nextLine = reader.peek();
-      while(nextLine != null && nextLine.level == null) {
-        reader.moveNext();
-        nextLine = reader.peek();
-      }
+      final nextLine = reader.peek();
 
       // if the next line is the same level, then we have a blank block
       if(nextLine == null || nextLine.level == level) {
@@ -236,15 +242,10 @@ class _BlockIterator extends Iterator<Block> {
 
         _current = new Block(currentLine.value, childIterable);
         return true;
-      } else if(nextLine.level > (level + 1)) {
-        throw 'next level is indented too much';
       }
-
-      throw 'should never get here, right?';
+      assert(nextLine.level > (level + 1));
+      throw 'next level is indented too much';
     }
     return false;
   }
-
-  Block get current => _current;
-
 }
