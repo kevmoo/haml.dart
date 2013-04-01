@@ -1,4 +1,6 @@
-part of haml;
+library block;
+
+import 'package:bot/bot.dart';
 
 class Block {
   final String header;

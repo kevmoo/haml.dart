@@ -1,8 +1,7 @@
 library test.block_parser;
 
 import 'package:unittest/unittest.dart';
-import 'package:okoboji/haml.dart';
-import 'package:bot/bot.dart';
+import 'package:okoboji/block.dart';
 
 void main() {
   group('block parser', () {
