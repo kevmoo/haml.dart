@@ -7,20 +7,6 @@ import 'package:bot/bot.dart';
 void main() {
   group('block parser', () {
 
-    test('runes and code units and spaces and tabs', () {
-      final spaceTab = ' \t';
-      expect(spaceTab, hasLength(2));
-      expect(spaceTab.codeUnits, hasLength(2));
-      expect(spaceTab.runes, hasLength(2));
-
-      expect(3 % 2, equals(1));
-      expect(3 % 1, equals(0));
-      expect(3 % 3, equals(0));
-      expect(3 % 4, equals(3));
-      expect(3 % 5, equals(3));
-      expect(3 % 6, equals(3));
-    });
-
     test('blank to empty', () {
       final blocks = Block.getBlocks('').toList();
       expect(blocks, isEmpty);
@@ -90,9 +76,36 @@ void main() {
         });
       });
     });
+
+    group('valid', () {
+      _valid.forEach((key, value) {
+        test(key, () {
+          expect(() => Block.getBlocks(value).toList(), returnsNormally);
+        });
+      });
+    });
   });
 
 }
+
+const _valid = const {
+  'empty string': '',
+  'new lines': '\n\n',
+  '3 levels, with blanks': '''
+
+hello
+  tom
+
+    test
+
+  cool
+
+beans
+
+now
+
+'''
+};
 
 const _invalid = const {
   'null': null,
@@ -105,5 +118,10 @@ hello
 hello
   two spaces - ok
    three spaces - bad!
+''',
+  'inconsistent indent2': '''
+hello
+  two spaces - ok
+     three spaces - bad!
 '''
 };

@@ -52,7 +52,6 @@ class _LineIterator extends Iterator<_Line> {
     if(_current != null && _current.value.isEmpty && _reader.eof) {
       _current = null;
     }
-    print(_current);
     return _current != null;
   }
 
@@ -205,11 +204,22 @@ class _BlockIterator extends Iterator<Block> {
   }
 
   bool moveNext() {
-    if(!_done && reader.moveNext()) {
-      final currentLine = reader.current;
+    while(!_done && reader.moveNext()) {
+      var currentLine = reader.current;
+
+      // the currentLine might be blank, which is represented by level == null
+      // so churn through lines until we get to a non-null level
+      if(currentLine.level == null) {
+        continue;
+      }
+
       assert(currentLine.level == level);
 
-      final nextLine = reader.peek();
+      var nextLine = reader.peek();
+      while(nextLine != null && nextLine.level == null) {
+        reader.moveNext();
+        nextLine = reader.peek();
+      }
 
       // if the next line is the same level, then we have a blank block
       if(nextLine == null || nextLine.level == level) {
