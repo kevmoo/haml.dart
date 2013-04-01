@@ -11,6 +11,11 @@ class Block {
     assert(children.every((b) => b != null));
   }
 
+  bool operator ==(other) {
+    return other is Block && other.header == this.header &&
+        this.children.itemsEqual(other.children);
+  }
+
   static Iterable<Block> getBlocks(String source) {
     assert(source != null);
 
