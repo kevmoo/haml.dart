@@ -2,6 +2,7 @@ library test.block_parser;
 
 import 'dart:io';
 import 'dart:json' as json;
+import 'package:petitparser/petitparser.dart';
 import 'package:unittest/unittest.dart';
 import 'package:pathos/path.dart' as pathos;
 
@@ -131,6 +132,41 @@ void main() {
   });
 }
 
+void _testPrefixGrammar(String value) {
+  final blocks = Block.getBlocks(value).toList();
+
+  /*
+  print('*old blocks');
+  print(blocks);
+  print(Error.safeToString(Block.getString(blocks)));
+  */
+
+  final prefixedVal = Block.getPrefixedString(blocks);
+
+  final grammar = new BlockParser();
+  Result thing = grammar.parse(prefixedVal);
+
+  if(thing is Failure) {
+    String buffer = thing.buffer;
+    if(buffer.startsWith('-#')) {
+      // TODO: support comments!
+      print('Ignoring comments for now.');
+      return;
+    }
+    fail(thing.toString());
+  }
+
+  List<Block> newBlocks = thing.result;
+
+  /*
+  print('*new blocks');
+  print(newBlocks);
+  print(Error.safeToString(Block.getString(newBlocks)));
+  */
+
+  expect(newBlocks, orderedEquals(blocks));
+}
+
 void _multiRoundTrip(String name, String value) {
   group(name, () {
     test('getBlocks', () {
@@ -151,8 +187,7 @@ void _multiRoundTrip(String name, String value) {
       });
     });
     test('prefix grammar', () {
-      final blocks = Block.getBlocks(value).toList();
-      print(Block.getPrefixedString(blocks));
+      _testPrefixGrammar(value);
     });
   });
 }
@@ -168,6 +203,7 @@ void _roundTrip(String value, int indentUnit, int indentCount) {
 }
 
 const _valid = const {
+  'hello': 'hello',
   'empty string': '',
   'new lines': '\n\n',
   'simple outline': '''
@@ -184,6 +220,10 @@ const _valid = const {
   4.1.2
  4.2
 5  
+''',
+  '2 levels, simple': '''
+level1
+  level2
 ''',
   '3 levels, with blanks': '''
 

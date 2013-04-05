@@ -1,6 +1,10 @@
 library block;
 
 import 'package:bot/bot.dart';
+import 'package:petitparser/petitparser.dart';
+
+part 'src/block/grammar.dart';
+part 'src/block/parser.dart';
 
 final _indentUnit = '+'.codeUnits.single;
 final _undentUnit = '-'.codeUnits.single;
@@ -13,8 +17,14 @@ class Block {
     this.children = new ReadOnlyCollection(items) {
     requireArgumentNotNullOrEmpty(header, 'header');
     assert(!_Line.isWhite(header.codeUnits.first));
+
+    // TODO: we might have a model for comments, which makes headers
+    // multi-line. But for now...
+    assert(!header.contains('\n'));
+    assert(!header.contains('\r'));
+
     assert(children != null);
-    assert(children.every((b) => b != null));
+    assert(children.every((b) => b is Block));
   }
 
   bool operator ==(other) {
@@ -73,7 +83,7 @@ class Block {
     assert(_Line.isWhite(indentUnit));
     assert(indentCount > 0);
 
-    for(final b in blocks) {
+    for(Block b in blocks) {
       for(var i = 0; i < level * indentCount; i++) {
         buffer.writeCharCode(indentUnit);
       }
