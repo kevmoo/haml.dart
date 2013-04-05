@@ -1,10 +1,39 @@
 library block;
 
+import 'dart:async';
 import 'package:bot/bot.dart';
 import 'package:petitparser/petitparser.dart';
 
 part 'src/block/grammar.dart';
 part 'src/block/parser.dart';
+
+StreamTransformer<String, String> splitLines() {
+  var remainder = null;
+  return new StreamTransformer<String, String>(
+      handleData: (String data, EventSink<String> sink) {
+        assert(data != null);
+        final reader = new StringLineReader(data);
+        while(true) {
+          var line = reader.readNextLine();
+          assert(line != null);
+          if(remainder != null) {
+            line = remainder + line;
+            remainder = null;
+          }
+          if(reader.eof) {
+            remainder = line;
+            break;
+          } else {
+            sink.add(line);
+          }
+        }
+      },
+      handleDone: (EventSink<String> sink) {
+        assert(remainder == null || remainder.isEmpty);
+        sink.close();
+      }
+  );
+}
 
 final _indentUnit = '+'.codeUnits.single;
 final _undentUnit = '-'.codeUnits.single;
