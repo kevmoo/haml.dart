@@ -1,7 +1,7 @@
 part of block;
 
-const _indent = const _Holder('indent');
-const _undent = const _Holder('undent');
+const INDENT = const _Holder('indent');
+const UNDENT = const _Holder('undent');
 
 class _Holder {
   final String value;
@@ -10,9 +10,10 @@ class _Holder {
 }
 
 StreamTransformer<_Line, dynamic> toFlat() {
+StreamTransformer<Line, dynamic> toFlat() {
   int lastLevel = null;
-  return new StreamTransformer<_Line, dynamic>(
-      handleData: (_Line data, EventSink<dynamic> sink) {
+  return new StreamTransformer<Line, dynamic>(
+      handleData: (Line data, EventSink<dynamic> sink) {
         assert(data != null);
         assert(lastLevel != null || data.level == 0);
         if(lastLevel == null) {
@@ -21,10 +22,10 @@ StreamTransformer<_Line, dynamic> toFlat() {
 
         if(data.level > lastLevel) {
           assert(data.level - lastLevel == 1);
-          sink.add(_indent);
+          sink.add(INDENT);
         } else {
           while(data.level < lastLevel) {
-            sink.add(_undent);
+            sink.add(UNDENT);
             lastLevel--;
           }
         }
@@ -34,16 +35,16 @@ StreamTransformer<_Line, dynamic> toFlat() {
       });
 }
 
-StreamTransformer<String, _Line> toLines() {
+StreamTransformer<String, Line> toLines() {
   int _indentUnit;
   int _indentRepeat;
 
-  return new StreamTransformer<String, _Line>(
-      handleData: (String data, EventSink<_Line> sink) {
+  return new StreamTransformer<String, Line>(
+      handleData: (String data, EventSink<Line> sink) {
         assert(data != null);
         print(data);
 
-        final line = _Line.parse(data, _indentUnit, _indentRepeat);
+        final line = Line.parse(data, _indentUnit, _indentRepeat);
         if(_indentUnit == null && line is _LinePlus) {
           assert(_indentRepeat == null);
           assert(line.level == 1);

@@ -19,7 +19,7 @@ class Block {
   Block(this.header, Iterable<Block> items) :
     this.children = new ReadOnlyCollection(items) {
     requireArgumentNotNullOrEmpty(header, 'header');
-    assert(!_Line.isWhite(header.codeUnits.first));
+    assert(!Line.isWhite(header.codeUnits.first));
 
     // TODO: we might have a model for comments, which makes headers
     // multi-line. But for now...
@@ -81,9 +81,9 @@ class Block {
     int level: 0, int indentUnit, int indentCount: 2}) {
     assert(level >= 0);
     if(indentUnit == null) {
-      indentUnit = _Line._space;
+      indentUnit = Line._space;
     }
-    assert(_Line.isWhite(indentUnit));
+    assert(Line.isWhite(indentUnit));
     assert(indentCount > 0);
 
     for(Block b in blocks) {
@@ -98,27 +98,27 @@ class Block {
   }
 }
 
-class _LineIterable extends Iterable<_Line> {
+class LineIterable extends Iterable<Line> {
   final String source;
 
-  _LineIterable(this.source);
+  LineIterable(this.source);
 
-  Iterator<_Line> get iterator => new _LineIterator(source);
+  Iterator<Line> get iterator => new LineIterator(source);
 }
 
-class _LineIterator extends Iterator<_Line> {
+class LineIterator extends Iterator<Line> {
   final StringLineReader _reader;
 
   int _indentUnit;
   int _indentRepeat;
 
-  _Line _current;
+  Line _current;
 
-  _LineIterator(String source) : this._reader = new StringLineReader(source);
+  LineIterator(String source) : this._reader = new StringLineReader(source);
 
-  _Line get current => _current;
+  Line get current => _current;
 
-  _Line peek() {
+  Line peek() {
     // We skip blank lines. Where line.level == null
     while(true) {
       final value = _reader.peekNextLine();
@@ -144,8 +144,8 @@ class _LineIterator extends Iterator<_Line> {
     return _current != null;
   }
 
-  _Line _process(String value) {
-    final line = _Line.parse(value, _indentUnit, _indentRepeat);
+  Line _process(String value) {
+    final line = Line.parse(value, _indentUnit, _indentRepeat);
     if(_indentUnit == null && line is _LinePlus) {
       assert(_indentRepeat == null);
       assert(line.level == 1);
@@ -157,9 +157,9 @@ class _LineIterator extends Iterator<_Line> {
 }
 
 class _BlockIterable extends Iterable<Block> {
-  final _LineIterable source;
+  final LineIterable source;
 
-  _BlockIterable(String value) : source = new _LineIterable(value);
+  _BlockIterable(String value) : source = new LineIterable(value);
 
   Iterator<Block> get iterator => new _BlockIterator(source);
 }
@@ -179,12 +179,12 @@ class _OnceIterable<E> extends Iterable<E> {
 }
 
 class _BlockIterator extends Iterator<Block> {
-  final _LineIterator reader;
+  final LineIterator reader;
   final int level;
   Block _current;
   bool _done = false;
 
-  _BlockIterator(_LineIterable source) :
+  _BlockIterator(LineIterable source) :
     this.reader = source.iterator, this.level = 0;
 
   _BlockIterator.child(this.reader, this.level) {

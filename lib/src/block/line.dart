@@ -1,21 +1,21 @@
 part of block;
 
-class _LinePlus extends _Line {
+class _LinePlus extends Line {
   final int indentUnit;
   final int indentRepeat;
 
   _LinePlus(String value, this.indentUnit, this.indentRepeat) :
     super(1, value) {
-    assert(_Line.isWhite(indentUnit));
+    assert(Line.isWhite(indentUnit));
     assert(indentRepeat > 0);
   }
 }
 
-class _Line {
+class Line {
   final int level;
   final String value;
 
-  _Line(this.level, this.value) {
+  Line(this.level, this.value) {
     assert(level >= 0);
     assert(value != null);
     assert(!value.isEmpty);
@@ -23,19 +23,19 @@ class _Line {
     assert(value.codeUnitAt(0) != _space);
   }
 
-  const _Line.empty() : this.level = null, this.value = '';
+  const Line.empty() : this.level = null, this.value = '';
 
   String toString() => '$level\t$value';
 
-  static _Line parse(String line, int indentUnit, int indentRepeat) {
+  static Line parse(String line, int indentUnit, int indentRepeat) {
     if(line == null) return null;
-    if(line.isEmpty) return const _Line.empty();
+    if(line.isEmpty) return const Line.empty();
 
     if(indentUnit == null) {
       if(isWhite(line.codeUnits.first)) {
         // this could be bad. If the rest of the string isn't white, then throw!
         if(line.codeUnits.every(isWhite)) {
-          return const _Line.empty();
+          return const Line.empty();
         }
         assert(indentRepeat == null);
 
@@ -67,7 +67,7 @@ class _Line {
 
         return new _LinePlus(line.substring(indentRepeat), indentUnit, indentRepeat);
       }
-      return new _Line(0, line);
+      return new Line(0, line);
     } else {
       // so we have a level, which means
       assert(isWhite(indentUnit));
@@ -88,7 +88,7 @@ class _Line {
 
       final level = indent.length ~/ indentRepeat;
 
-      return new _Line(level, line.substring(indent.length));
+      return new Line(level, line.substring(indent.length));
     }
 
     throw 'should never get here...right?';
