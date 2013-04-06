@@ -14,7 +14,7 @@ final _rnd = new math.Random();
 void main() {
   test('yay', () {
 
-    final target = 5000;
+    final target = 20;
 
     final strStream = getRandomBlockStream(target);
     final byteStream = new StringEncoder().bind(strStream);
@@ -22,13 +22,16 @@ void main() {
     final unzipStream = new ZLibInflater().bind(zipStream);
     final decodedStream = new StringDecoder().bind(unzipStream);
     final lines = decodedStream.transform(splitLines());
+    final magicLines = lines.transform(toLines());
+    final flatLines = magicLines.transform(toFlat());
 
-    return lines.reduce(0, (int count, String element) {
-      print(element);
-      return count + 1;
-    }).then((int count) {
-      expect(count, target);
-    });
+    return flatLines.toList()
+        .then((list) {
+          print('');
+          print("results...");
+          list.forEach(print);
+
+        });
   });
 }
 
