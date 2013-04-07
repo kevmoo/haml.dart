@@ -3,8 +3,6 @@ part of block;
 const INDENT = const _Holder('indent');
 const UNDENT = const _Holder('undent');
 
-const _EOF = const _Holder('EOF');
-
 class _Holder {
   final String value;
   const _Holder(this.value);
@@ -35,7 +33,7 @@ StreamTransformer<dynamic, Block> toBlocks() {
         assert(!builder._finished);
 
         if(!empty) {
-          var block = builder.build(_EOF);
+          var block = builder.build(UNDENT);
 
           // only one case where the return value here is null
           // iif the input stream was empty...right?
@@ -64,7 +62,7 @@ class _BlockBuilder {
         _builder = new _BlockBuilder();
       } else {
         var block = new Block(_head, _childBlocks);
-        if(data == UNDENT || data == _EOF) {
+        if(data == UNDENT) {
           _finished = true;
         } else {
           _head = data;
@@ -87,10 +85,6 @@ class _BlockBuilder {
 
       if(_builder._finished) {
         _builder = null;
-      }
-
-      if(data == _EOF) {
-        return new Block(_head, _childBlocks);
       }
     }
   }
@@ -119,6 +113,15 @@ StreamTransformer<Line, dynamic> toFlat() {
 
         sink.add(data.value);
         lastLevel = data.level;
+      },
+      handleDone: (EventSink<dynamic> sink) {
+        if(lastLevel != null) {
+          while(lastLevel > 0) {
+            sink.add(UNDENT);
+            lastLevel--;
+          }
+        }
+        sink.close();
       });
 }
 
