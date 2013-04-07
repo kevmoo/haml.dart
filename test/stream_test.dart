@@ -42,10 +42,10 @@ void main() {
     final byteStream = strStream.transform(new StringEncoder());
     final chunkStream = byteStream.transform(_chunkList(100));
     final decodedStream = chunkStream.transform(new StringDecoder());
-    final lines = decodedStream.transform(splitLines());
-    final magicLines = lines.transform(toLines());
-    final flatLines = magicLines.transform(toFlat());
-    final blockStream = flatLines.transform(toBlocks());
+    final lines = decodedStream.transform(stringToLines());
+    final magicLines = lines.transform(linesToIndents());
+    final flatLines = magicLines.transform(indentsToTokens());
+    final blockStream = flatLines.transform(tokensToBlocks());
 
     return blockStream.toList()
         .then((list) {

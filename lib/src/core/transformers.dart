@@ -16,7 +16,7 @@ class _Holder {
  * [UNDENT]
  * Nothing else.
  */
-StreamTransformer<dynamic, Block> toBlocks() {
+StreamTransformer<dynamic, Block> tokensToBlocks() {
   final builder = new _BlockBuilder();
   bool empty = true;
 
@@ -90,11 +90,15 @@ class _BlockBuilder {
   }
 }
 
-
-StreamTransformer<Line, dynamic> toFlat() {
+/**
+ * The resulting tokes are one of:
+ *
+ * [String], [INDENT], or [UNDENT].
+ */
+StreamTransformer<IndentLine, dynamic> indentsToTokens() {
   int lastLevel = null;
-  return new StreamTransformer<Line, dynamic>(
-      handleData: (Line data, EventSink<dynamic> sink) {
+  return new StreamTransformer<IndentLine, dynamic>(
+      handleData: (IndentLine data, EventSink<dynamic> sink) {
         assert(data != null);
         assert(lastLevel != null || data.level == 0);
         if(lastLevel == null) {
@@ -125,16 +129,16 @@ StreamTransformer<Line, dynamic> toFlat() {
       });
 }
 
-StreamTransformer<String, Line> toLines() {
+StreamTransformer<String, IndentLine> linesToIndents() {
   int _indentUnit;
   int _indentRepeat;
 
-  return new StreamTransformer<String, Line>(
-      handleData: (String data, EventSink<Line> sink) {
+  return new StreamTransformer<String, IndentLine>(
+      handleData: (String data, EventSink<IndentLine> sink) {
         assert(data != null);
 
-        final line = Line.parse(data, _indentUnit, _indentRepeat);
-        if(_indentUnit == null && line is _LinePlus) {
+        final line = IndentLine.parse(data, _indentUnit, _indentRepeat);
+        if(_indentUnit == null && line is _IndentLinePlus) {
           assert(_indentRepeat == null);
           assert(line.level == 1);
           _indentUnit = line.indentUnit;
@@ -145,7 +149,7 @@ StreamTransformer<String, Line> toLines() {
       });
 }
 
-StreamTransformer<String, String> splitLines() {
+StreamTransformer<String, String> stringToLines() {
   var remainder = null;
   return new StreamTransformer<String, String>(
       handleData: (String data, EventSink<String> sink) {

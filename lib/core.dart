@@ -6,7 +6,7 @@ import 'package:petitparser/petitparser.dart';
 
 part 'src/core/block.dart';
 part 'src/core/grammar.dart';
-part 'src/core/line.dart';
+part 'src/core/indent_line.dart';
 part 'src/core/parser.dart';
 part 'src/core/transformers.dart';
 part 'src/core/walker.dart';

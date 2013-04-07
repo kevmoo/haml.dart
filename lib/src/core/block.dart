@@ -7,7 +7,7 @@ class Block {
   Block(this.header, [Iterable<Block> items = null]) :
     this.children = new ReadOnlyCollection(items == null ? [] : items) {
     requireArgumentNotNullOrEmpty(header, 'header');
-    assert(!Line.isWhite(header.codeUnits.first));
+    assert(!IndentLine.isWhite(header.codeUnits.first));
 
     // TODO: we might have a model for comments, which makes headers
     // multi-line. But for now...
@@ -75,9 +75,9 @@ class Block {
     int level: 0, int indentUnit, int indentCount: 2}) {
     assert(level >= 0);
     if(indentUnit == null) {
-      indentUnit = Line._space;
+      indentUnit = IndentLine._space;
     }
-    assert(Line.isWhite(indentUnit));
+    assert(IndentLine.isWhite(indentUnit));
     assert(indentCount > 0);
 
     for(Block b in blocks) {

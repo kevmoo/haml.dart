@@ -24,6 +24,8 @@ class Walker<S, T> implements StreamTransformer<S, T> {
     return new _WalkerIterable<S, T>(this, source);
   }
 
+  Iterable<T> single(S source) => map([source]);
+
   Stream<T> bind(Stream<S> stream) {
     final tx = new StreamTransformer<S, T>(handleData: _handleData,
         handleError: _handleError, handleDone: _handleDone);

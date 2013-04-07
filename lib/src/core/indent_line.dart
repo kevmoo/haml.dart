@@ -1,21 +1,21 @@
 part of core;
 
-class _LinePlus extends Line {
+class _IndentLinePlus extends IndentLine {
   final int indentUnit;
   final int indentRepeat;
 
-  _LinePlus(String value, this.indentUnit, this.indentRepeat) :
+  _IndentLinePlus(String value, this.indentUnit, this.indentRepeat) :
     super(1, value) {
-    assert(Line.isWhite(indentUnit));
+    assert(IndentLine.isWhite(indentUnit));
     assert(indentRepeat > 0);
   }
 }
 
-class Line {
+class IndentLine {
   final int level;
   final String value;
 
-  Line(this.level, this.value) {
+  IndentLine(this.level, this.value) {
     assert(level >= 0);
     assert(value != null);
     assert(!value.isEmpty);
@@ -23,19 +23,19 @@ class Line {
     assert(value.codeUnitAt(0) != _space);
   }
 
-  const Line.empty() : this.level = null, this.value = '';
+  const IndentLine.empty() : this.level = null, this.value = '';
 
   String toString() => '$level\t$value';
 
-  static Line parse(String line, int indentUnit, int indentRepeat) {
+  static IndentLine parse(String line, int indentUnit, int indentRepeat) {
     if(line == null) return null;
-    if(line.isEmpty) return const Line.empty();
+    if(line.isEmpty) return const IndentLine.empty();
 
     if(indentUnit == null) {
       if(isWhite(line.codeUnits.first)) {
         // this could be bad. If the rest of the string isn't white, then throw!
         if(line.codeUnits.every(isWhite)) {
-          return const Line.empty();
+          return const IndentLine.empty();
         }
         assert(indentRepeat == null);
 
@@ -65,9 +65,9 @@ class Line {
           indentRepeat++;
         }
 
-        return new _LinePlus(line.substring(indentRepeat), indentUnit, indentRepeat);
+        return new _IndentLinePlus(line.substring(indentRepeat), indentUnit, indentRepeat);
       }
-      return new Line(0, line);
+      return new IndentLine(0, line);
     } else {
       // so we have a level, which means
       assert(isWhite(indentUnit));
@@ -88,7 +88,7 @@ class Line {
 
       final level = indent.length ~/ indentRepeat;
 
-      return new Line(level, line.substring(indent.length));
+      return new IndentLine(level, line.substring(indent.length));
     }
 
     throw 'should never get here...right?';
