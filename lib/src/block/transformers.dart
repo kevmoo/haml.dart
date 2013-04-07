@@ -20,114 +20,77 @@ class _Holder {
  */
 StreamTransformer<dynamic, Block> toBlocks() {
   final builder = new _BlockBuilder();
+  bool empty = true;
 
   return new StreamTransformer<dynamic, Block>(
       handleData: (dynamic data, EventSink<Block> sink) {
-        log(data.toString(), AnsiColor.BLUE);
+        empty = false;
+
         var block = builder.build(data);
         if(block != null) {
           sink.add(block);
         }
       },
       handleDone: (EventSink<Block> sink) {
-        assert(!builder.finished);
-        print('final undent');
+        assert(!builder._finished);
 
-        try{
+        if(!empty) {
           var block = builder.build(_EOF);
+
           // only one case where the return value here is null
           // iif the input stream was empty...right?
-          if(block != null) {
-            sink.add(block);
-          }
-        } catch (e, s) {
-          print("oops! $e $s");
-        } finally {
-          sink.close();
+          assert(block != null);
+
+          sink.add(block);
         }
+        sink.close();
       });
 }
 
 class _BlockBuilder {
-  static int _idCount = 0;
-
-  final int _id;
   String _head;
   _BlockBuilder _builder;
   List<Block> _childBlocks;
-  bool finished = false;
-
-  void _log(String value) {
-    log([_id, value]);
-  }
-
-  _BlockBuilder() : _id = _idCount++ {
-    _log('new Builder');
-  }
+  bool _finished = false;
 
   Block build(dynamic data) {
-    _log("ello...");
-    assert(!finished);
+    assert(!_finished);
     if(_head == null) {
       assert(_builder == null);
       assert(data is String);
-      _log('new head: $data');
       _head = data;
     } else if(_builder == null) {
       if(data == INDENT) {
-        _log('indent!');
         _builder = new _BlockBuilder();
-      } else if(data == UNDENT) {
-        _log('undent - builder is finished');
-        finished = true;
-        if(_childBlocks == null) {
-          _childBlocks = [];
-        }
-        return new Block(_head, _childBlocks);
-      } else if(data == _EOF) {
-        _log('EOF...clear out');
-        try {
-          return new Block(_head, []);
-        } finally {
-          finished = true;
-        }
       } else {
-        _log('throw out the last guy: $data');
-        try {
-          if(_childBlocks == null) {
-            _childBlocks = [];
-          }
-          return new Block(_head, _childBlocks);
-        } finally {
-          _childBlocks = null;
+        var block = new Block(_head, _childBlocks);
+        if(data == UNDENT || data == _EOF) {
+          _finished = true;
+        } else {
           _head = data;
+          _childBlocks = null;
         }
+        return block;
       }
     } else {
-      _log('pushing data to child: $data');
       var block = _builder.build(data);
-      _log('data: $data \t block: $block');
-      if(block != null) {
-        if(_childBlocks == null) {
-          _childBlocks = new List<Block>();
-        }
-        _childBlocks.add(block);
-        if(_builder.finished) {
-          _log("builder finishing, next round should undent, right?");
-          _builder = null;
-        }
 
-        if(data == _EOF) {
-          // let's clear out now
-          try {
-            _log('clearing out EOF');
-            return new Block(_head, _childBlocks);
-          } finally {
-            finished = true;
-          }
-        }
-      } else {
-        assert(!_builder.finished);
+      if(block == null) {
+        assert(!_builder._finished);
+        return null;
+      }
+
+      if(_childBlocks == null) {
+        _childBlocks = new List<Block>();
+      }
+      _childBlocks.add(block);
+
+      if(_builder._finished) {
+        _builder = null;
+      }
+
+      if(data == _EOF) {
+        return new Block(_head, _childBlocks);
       }
     }
   }

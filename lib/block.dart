@@ -4,9 +4,6 @@ import 'dart:async';
 import 'package:bot/bot.dart';
 import 'package:petitparser/petitparser.dart';
 
-import 'package:bot/bot_io.dart';
-import 'util.dart';
-
 part 'src/block/grammar.dart';
 part 'src/block/line.dart';
 part 'src/block/parser.dart';
@@ -19,8 +16,8 @@ class Block {
   final String header;
   final Sequence<Block> children;
 
-  Block(this.header, Iterable<Block> items) :
-    this.children = new ReadOnlyCollection(items) {
+  Block(this.header, [Iterable<Block> items = null]) :
+    this.children = new ReadOnlyCollection(items == null ? [] : items) {
     requireArgumentNotNullOrEmpty(header, 'header');
     assert(!Line.isWhite(header.codeUnits.first));
 
