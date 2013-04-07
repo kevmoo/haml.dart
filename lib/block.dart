@@ -8,6 +8,7 @@ part 'src/block/grammar.dart';
 part 'src/block/line.dart';
 part 'src/block/parser.dart';
 part 'src/block/transformers.dart';
+part 'src/block/walker.dart';
 
 final _indentUnit = '+'.codeUnits.single;
 final _undentUnit = '-'.codeUnits.single;
