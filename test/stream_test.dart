@@ -21,19 +21,22 @@ Iterable<Iterable<int>> _getSquare(int size) {
 }
 
 void main() {
-  test('crazy', () {
-    final source = _getSquare(10);
-    print(source);
+  test('simple walker test', () {
+    const squareSize = 5;
+    final source = _getSquare(squareSize);
+    expect(source.expand((e) => e).length, squareSize * squareSize);
 
-    final output = _chunkList(15).map(source).toList();
-    print('');
-    print(output);
+    const chunkSize = 10;
+    final output = _chunkList(chunkSize).map(source).toList();
+
+    // TODO: could be a bit more clever about testing here, but for now...
+    expect(output.expand((e) => e).length, squareSize * squareSize);
 
   });
 
-  test('yay', () {
+  test('simple, random indent test', () {
 
-    final target = 30;
+    final target = 10;
 
     final strStream = getRandomBlockStream(target);
     final byteStream = strStream.transform(new StringEncoder());
@@ -46,10 +49,6 @@ void main() {
 
     return blockStream.toList()
         .then((list) {
-          print('');
-          print("results...");
-          print('');
-          print(Block.getString(list));
 
           var totalCount = list.fold(0, (int v, Block b) => v + b.getTotalCount());
           expect(totalCount, target);
