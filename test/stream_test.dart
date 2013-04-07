@@ -14,7 +14,7 @@ final _rnd = new math.Random();
 void main() {
   test('yay', () {
 
-    final target = 20;
+    final target = 30;
 
     final strStream = getRandomBlockStream(target);
     final byteStream = new StringEncoder().bind(strStream);
@@ -24,13 +24,17 @@ void main() {
     final lines = decodedStream.transform(splitLines());
     final magicLines = lines.transform(toLines());
     final flatLines = magicLines.transform(toFlat());
+    final blockStream = flatLines.transform(toBlocks());
 
-    return flatLines.toList()
+    return blockStream.toList()
         .then((list) {
           print('');
           print("results...");
-          list.forEach(print);
+          print('');
+          print(Block.getString(list));
 
+          var totalCount = list.fold(0, (int v, Block b) => v + b.getTotalCount());
+          expect(totalCount, target);
         });
   });
 }

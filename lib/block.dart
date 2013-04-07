@@ -4,6 +4,9 @@ import 'dart:async';
 import 'package:bot/bot.dart';
 import 'package:petitparser/petitparser.dart';
 
+import 'package:bot/bot_io.dart';
+import 'util.dart';
+
 part 'src/block/grammar.dart';
 part 'src/block/line.dart';
 part 'src/block/parser.dart';
@@ -33,6 +36,12 @@ class Block {
   bool operator ==(other) {
     return other is Block && other.header == this.header &&
         this.children.itemsEqual(other.children);
+  }
+
+  int getTotalCount() {
+    return children.fold(1, (int val, Block child) {
+      return val + child.getTotalCount();
+    });
   }
 
   static String getPrefixedString(Iterable<Block> blocks) {
