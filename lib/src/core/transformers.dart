@@ -16,11 +16,11 @@ class _Holder {
  * [UNDENT]
  * Nothing else.
  */
-StreamTransformer<dynamic, Block> tokensToBlocks() {
+Walker<dynamic, Block> tokensToBlocks() {
   final builder = new _BlockBuilder();
   bool empty = true;
 
-  return new StreamTransformer<dynamic, Block>(
+  return new Walker<dynamic, Block>(
       handleData: (dynamic data, EventSink<Block> sink) {
         empty = false;
 
@@ -95,9 +95,9 @@ class _BlockBuilder {
  *
  * [String], [INDENT], or [UNDENT].
  */
-StreamTransformer<IndentLine, dynamic> indentsToTokens() {
+Walker<IndentLine, dynamic> indentsToTokens() {
   int lastLevel = null;
-  return new StreamTransformer<IndentLine, dynamic>(
+  return new Walker<IndentLine, dynamic>(
       handleData: (IndentLine data, EventSink<dynamic> sink) {
         assert(data != null);
         assert(lastLevel != null || data.level == 0);
@@ -129,11 +129,11 @@ StreamTransformer<IndentLine, dynamic> indentsToTokens() {
       });
 }
 
-StreamTransformer<String, IndentLine> linesToIndents() {
+Walker<String, IndentLine> linesToIndents() {
   int _indentUnit;
   int _indentRepeat;
 
-  return new StreamTransformer<String, IndentLine>(
+  return new Walker<String, IndentLine>(
       handleData: (String data, EventSink<IndentLine> sink) {
         assert(data != null);
 
@@ -149,9 +149,9 @@ StreamTransformer<String, IndentLine> linesToIndents() {
       });
 }
 
-StreamTransformer<String, String> stringToLines() {
+Walker<String, String> stringToLines() {
   var remainder = null;
-  return new StreamTransformer<String, String>(
+  return new Walker<String, String>(
       handleData: (String data, EventSink<String> sink) {
         assert(data != null);
         final reader = new StringLineReader(data);
