@@ -17,10 +17,9 @@ void main() {
     final target = 30;
 
     final strStream = getRandomBlockStream(target);
-    final byteStream = new StringEncoder().bind(strStream);
-    final zipStream = new ZLibDeflater().bind(byteStream);
-    final unzipStream = new ZLibInflater().bind(zipStream);
-    final decodedStream = new StringDecoder().bind(unzipStream);
+    final byteStream = strStream.transform(new StringEncoder());
+    final chunkStream = byteStream.transform(_chunkListStream(100));
+    final decodedStream = chunkStream.transform(new StringDecoder());
     final lines = decodedStream.transform(splitLines());
     final magicLines = lines.transform(toLines());
     final flatLines = magicLines.transform(toFlat());
@@ -37,6 +36,43 @@ void main() {
           expect(totalCount, target);
         });
   });
+}
+
+StreamTransformer<List, List> _chunkListStream(int chunkSize) {
+  assert(chunkSize > 0);
+  List buffer;
+
+  return new StreamTransformer<List, List>(
+      handleData: (List data, EventSink<List> sink) {
+        int index = 0;
+
+        while(index < data.length) {
+          if(buffer == null) {
+            buffer = new List();
+          }
+
+          final startLength = buffer.length;
+          assert(startLength < chunkSize);
+
+          buffer.addAll(data.skip(index).take(chunkSize - startLength));
+          index += buffer.length - startLength;
+
+          if(buffer.length == chunkSize) {
+            sink.add(buffer);
+            buffer = null;
+          } else {
+            break;
+          }
+        }
+
+      },
+      handleDone: (EventSink<List> sink) {
+        if(buffer != null && !buffer.isEmpty) {
+          assert(buffer.length < chunkSize);
+          sink.add(buffer);
+        }
+        sink.close();
+      });
 }
 
 Stream<String> getRandomBlockStream(int rowCount) {
