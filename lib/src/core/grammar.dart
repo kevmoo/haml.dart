@@ -1,4 +1,4 @@
-part of block;
+part of core;
 
 class BlockGrammar extends CompositeParser {
 

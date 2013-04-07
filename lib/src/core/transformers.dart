@@ -1,4 +1,4 @@
-part of block;
+part of core;
 
 const INDENT = const _Holder('indent');
 const UNDENT = const _Holder('undent');

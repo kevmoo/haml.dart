@@ -6,7 +6,7 @@ import 'package:petitparser/petitparser.dart';
 import 'package:unittest/unittest.dart';
 import 'package:pathos/path.dart' as pathos;
 
-import 'package:okoboji/block.dart';
+import 'package:okoboji/core.dart';
 
 const _jsonTestPath = 'test/haml-spec/tests.json';
 

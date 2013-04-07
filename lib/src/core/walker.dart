@@ -1,4 +1,4 @@
-part of block;
+part of core;
 
 // TODO: yeah, all of this should be in the BOT
 

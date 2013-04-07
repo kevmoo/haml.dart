@@ -1,4 +1,4 @@
-part of block;
+part of core;
 
 class _LinePlus extends Line {
   final int indentUnit;
