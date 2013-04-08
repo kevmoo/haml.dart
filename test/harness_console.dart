@@ -3,8 +3,8 @@ library harness_console;
 import 'package:unittest/unittest.dart';
 import 'package:unittest/vm_config.dart';
 import 'haml/haml_test.dart' as haml;
-import 'block_parser_test.dart' as block;
-import 'stream_test.dart' as stream;
+import 'core/block_parser_test.dart' as block;
+import 'core/stream_test.dart' as stream;
 
 main() {
   final config = new VMConfiguration();
@@ -15,7 +15,10 @@ void testCore(Configuration config) {
   unittestConfiguration = config;
   groupSep = ' - ';
 
-  haml.main();
-  block.main();
-  group('stream', stream.main);
+  group('haml', haml.main);
+
+  group('core', () {
+    group('block', block.main);
+    group('stream', stream.main);
+  });
 }

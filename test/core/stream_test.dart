@@ -4,10 +4,10 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:bot/bot.dart';
-import 'package:unittest/unittest.dart';
+import '../../packages/bot/bot.dart';
+import '../../packages/unittest/unittest.dart';
 
-import 'package:okoboji/core.dart';
+import '../../lib/core.dart';
 
 final _rnd = new math.Random();
 
@@ -34,6 +34,7 @@ void main() {
 
   });
 
+  // TODO: move this to Block tests, right?
   test('simple, random indent test', () {
 
     final target = 10;

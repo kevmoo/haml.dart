@@ -5,7 +5,7 @@ import 'package:unittest/unittest.dart';
 
 import 'package:okoboji/core.dart';
 
-import 'test_shared.dart';
+import '../test_shared.dart';
 
 void main() {
 
