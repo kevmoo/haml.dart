@@ -1,20 +1,15 @@
 library test.block_parser;
 
-import 'dart:io';
-import 'dart:json' as json;
 import 'package:petitparser/petitparser.dart';
 import 'package:unittest/unittest.dart';
-import 'package:pathos/path.dart' as pathos;
 
 import 'package:okoboji/core.dart';
 
-const _jsonTestPath = 'test/haml-spec/tests.json';
+import 'test_shared.dart';
 
 void main() {
 
-  final jsonFile = new File(pathos.normalize(_jsonTestPath));
-
-  final Map<String, Map> jsonValue = json.parse(jsonFile.readAsStringSync());
+  final jsonValue = getHamlSpecTests();
 
   group('haml samples', () {
     jsonValue.forEach((groupName, Map<String, Map> testMap) {
