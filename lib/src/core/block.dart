@@ -18,16 +18,11 @@ class Block {
     assert(children.every((b) => b is Block));
   }
 
-  bool operator ==(other) {
-    return other is Block && other.header == this.header &&
+  bool operator ==(other) => other is Block && other.header == this.header &&
         this.children.itemsEqual(other.children);
-  }
 
-  int getTotalCount() {
-    return children.fold(1, (int val, Block child) {
-      return val + child.getTotalCount();
-    });
-  }
+  int getTotalCount() => children.fold(1, (int val, Block child) =>
+        val + child.getTotalCount());
 
   static String getPrefixedString(Iterable<Block> blocks) {
     final buffer = new StringBuffer();
