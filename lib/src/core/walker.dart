@@ -12,9 +12,8 @@ typedef void _handleDone<T>(EventSink<T> sink);
 abstract class Walker<S, T> implements StreamTransformer<S, T> {
 
   factory Walker({void handleData(S data, EventSink<T> sink),
-    void handleError(AsyncError error, EventSink<T> sink),
     void handleDone(EventSink<T> sink)}) {
-    return new _WalkerImpl(handleData, handleError, handleDone);
+    return new _WalkerImpl(handleData, handleDone);
   }
 
   factory Walker.fromMap(T mapper(S)) {
@@ -47,10 +46,9 @@ class _WalkerFromMap<S, T> extends Walker<S, T> {
 
 class _WalkerImpl<S, T> extends Walker<S, T> {
   final _handleData<S, T> _handleData;
-  final _handleError<T> _handleError;
   final _handleDone<T> _handleDone;
 
-  _WalkerImpl(this._handleData, this._handleError, this._handleDone) :
+  _WalkerImpl(this._handleData, this._handleDone) :
     super._internal();
 
   @override
@@ -64,7 +62,7 @@ class _WalkerImpl<S, T> extends Walker<S, T> {
   @override
   Stream<T> bind(Stream<S> stream) {
     final tx = new StreamTransformer<S, T>(handleData: _handleData,
-        handleError: _handleError, handleDone: _handleDone);
+        handleDone: _handleDone);
     return stream.transform(tx);
   }
 
