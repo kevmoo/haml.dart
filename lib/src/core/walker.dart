@@ -6,6 +6,9 @@ typedef void _handleData<S, T>(S data, EventSink<T> sink);
 typedef void _handleError<T>(AsyncError error, EventSink<T> sink);
 typedef void _handleDone<T>(EventSink<T> sink);
 
+// TODO: ponder Walker.fromExpand ... with an onDone method
+// call-backs that return Iterable<T> ... is nice?
+// one could argue this would replace fromMap. Folks could just return [item]
 abstract class Walker<S, T> implements StreamTransformer<S, T> {
 
   factory Walker({void handleData(S data, EventSink<T> sink),
@@ -14,14 +17,32 @@ abstract class Walker<S, T> implements StreamTransformer<S, T> {
     return new _WalkerImpl(handleData, handleError, handleDone);
   }
 
+  factory Walker.fromMap(T mapper(S)) {
+    return new _WalkerFromMap(mapper);
+  }
+
   Walker._internal();
 
+  // TODO: map should really be expand...ish?
+  // Not really map. Not really expand. Hmm...
   Iterable<T> map(Iterable<S> source);
 
   Iterable<T> single(S source) => map([source]);
 
   Walker<S, dynamic> chain(Walker<T, dynamic> value) =>
       new _ChainedWalker<S, dynamic>(this, value);
+}
+
+class _WalkerFromMap<S, T> extends Walker<S, T> {
+  final Func1<S, T> _mapper;
+
+  _WalkerFromMap(this._mapper) : super._internal();
+
+  @override
+  Iterable<T> map(Iterable<S> source) => source.map(_mapper);
+
+  @override
+  Stream<T> bind(Stream<S> stream) => stream.map(_mapper);
 }
 
 class _WalkerImpl<S, T> extends Walker<S, T> {

@@ -97,6 +97,26 @@ class _BlockBuilder {
   }
 }
 
+Walker<dynamic, String> tokenToPrefixedLine() {
+  return new Walker<dynamic, String>.fromMap((token) {
+        if(token == INDENT) {
+          return _indentStr;
+        } else if(token == UNDENT) {
+          return _undentStr;
+        }
+
+        assert(token is String);
+
+        if(token.codeUnits.every((u) => u == _indentUnit)) {
+          throw 'cannot have lines that are just indents...yet';
+        } else if(token.codeUnits.every((u) => u == _undentUnit)) {
+          throw 'cannot have lines that are just undents...yet';
+        }
+
+        return token;
+      });
+}
+
 /**
  * The resulting tokes are one of:
  *
@@ -147,8 +167,7 @@ Walker<String, IndentLine> linesToIndents() {
   int _indentUnit;
   int _indentRepeat;
 
-  return new Walker<String, IndentLine>(
-      handleData: (String data, EventSink<IndentLine> sink) {
+  return new Walker<String, IndentLine>.fromMap((String data) {
         assert(data != null);
 
         final line = IndentLine.parse(data, _indentUnit, _indentRepeat);
@@ -158,8 +177,7 @@ Walker<String, IndentLine> linesToIndents() {
           _indentUnit = line.indentUnit;
           _indentRepeat = line.indentRepeat;
         }
-        sink.add(line);
-
+        return line;
       });
 }
 

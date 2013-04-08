@@ -26,30 +26,21 @@ class Block {
 
   static String getPrefixedString(Iterable<Block> blocks) {
     final buffer = new StringBuffer();
-    _getLines(blocks).forEach((l) => buffer.writeln(l));
+
+    tokenToPrefixedLine().map(_getTokens(blocks))
+      .forEach((l) => buffer.writeln(l));
+
     return buffer.toString();
   }
 
-  static Iterable<String> _getLines(Iterable<Block> blocks) =>
-    blocks.expand((b) => b.getLines());
+  static Iterable<dynamic> _getTokens(Iterable<Block> blocks) =>
+    blocks.expand((b) => b.getTokens());
 
-  Iterable<String> getLines() {
-    // if the header is entirely indent/undent chars, then double them
-    String val;
-    if(header.codeUnits.every((u) => u == _indentUnit)) {
-      // TODO!!
-      throw 'not impld';
-    } else if(header.codeUnits.every((u) => u == _undentUnit)) {
-      // TODO!!
-      throw 'not impld';
-    } else {
-      val = header;
-    }
-
+  Iterable<dynamic> getTokens() {
     if(children.isEmpty) {
-      return [val];
+      return [header];
     } else {
-      return [[val, _indentStr], _getLines(children), [_undentStr]]
+      return [[header, INDENT], _getTokens(children), [UNDENT]]
         .expand((e) => e);
     }
   }
