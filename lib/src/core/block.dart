@@ -26,11 +26,14 @@ class Block {
 
   static String getPrefixedString(Iterable<Block> blocks) {
     final buffer = new StringBuffer();
-    blocks.forEach((b) => b.writePrefixedString(buffer));
+    _getLines(blocks).forEach((l) => buffer.writeln(l));
     return buffer.toString();
   }
 
-  void writePrefixedString(StringSink buffer) {
+  static Iterable<String> _getLines(Iterable<Block> blocks) =>
+    blocks.expand((b) => b.getLines());
+
+  Iterable<String> getLines() {
     // if the header is entirely indent/undent chars, then double them
     String val;
     if(header.codeUnits.every((u) => u == _indentUnit)) {
@@ -42,13 +45,12 @@ class Block {
     } else {
       val = header;
     }
-    buffer.writeln(val);
-    if(!children.isEmpty) {
-      buffer.writeCharCode(_indentUnit);
-      buffer.writeln();
-      children.forEach((b) => b.writePrefixedString(buffer));
-      buffer.writeCharCode(_undentUnit);
-      buffer.writeln();
+
+    if(children.isEmpty) {
+      return [val];
+    } else {
+      return [[val, _indentStr], _getLines(children), [_undentStr]]
+        .expand((e) => e);
     }
   }
 

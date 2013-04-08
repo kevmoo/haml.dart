@@ -15,5 +15,8 @@ part 'src/core/parser.dart';
 part 'src/core/transformers.dart';
 part 'src/core/walker.dart';
 
-final _indentUnit = '+'.codeUnits.single;
-final _undentUnit = '-'.codeUnits.single;
+const _indentStr = '+';
+final _undentStr = '-';
+
+final _indentUnit = _indentStr.codeUnits.single;
+final _undentUnit = _undentStr.codeUnits.single;
