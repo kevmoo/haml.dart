@@ -60,7 +60,7 @@ class Block {
   static Iterable<Block> getBlocks(String source) {
     assert(source != null);
 
-    return new _BlockIterable(source);
+    return stringToBlocks().single(source);
   }
 
   static String getString(Iterable<Block> blocks, {int indentUnit,

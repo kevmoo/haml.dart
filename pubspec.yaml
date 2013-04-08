@@ -4,3 +4,4 @@ dependencies:
   petitparser: '>=0.2.4+m4'
   logging: '>=0.4.4+4'
   pathos: '>=0.4.4+4'
+  meta: '>=0.4.4+4'

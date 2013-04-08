@@ -9,6 +9,13 @@ class _Holder {
   String toString() => '* $value *';
 }
 
+Walker<String, Block> stringToBlocks() {
+  return stringToLines()
+      .chain(linesToIndents())
+      .chain(indentsToTokens())
+      .chain(tokensToBlocks());
+}
+
 /**
  * Items can only be:
  * an instance of [String]
@@ -100,6 +107,13 @@ Walker<IndentLine, dynamic> indentsToTokens() {
   return new Walker<IndentLine, dynamic>(
       handleData: (IndentLine data, EventSink<dynamic> sink) {
         assert(data != null);
+
+        // whitespace
+        // TODO: have a better way to flag whitespace than level == null
+        if(data.level == null) {
+          return;
+        }
+
         assert(lastLevel != null || data.level == 0);
         if(lastLevel == null) {
           lastLevel = 0;
@@ -150,7 +164,7 @@ Walker<String, IndentLine> linesToIndents() {
 }
 
 Walker<String, String> stringToLines() {
-  var remainder = null;
+  String remainder = null;
   return new Walker<String, String>(
       handleData: (String data, EventSink<String> sink) {
         assert(data != null);
@@ -171,7 +185,10 @@ Walker<String, String> stringToLines() {
         }
       },
       handleDone: (EventSink<String> sink) {
-        assert(remainder == null || remainder.isEmpty);
+        if(remainder != null && !remainder.isEmpty) {
+          // should have no newline chars, right?
+          sink.add(remainder);
+        }
         sink.close();
       }
   );
