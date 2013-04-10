@@ -4,10 +4,10 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
-import '../../packages/bot/bot.dart';
-import '../../packages/unittest/unittest.dart';
+import 'package:bot/bot.dart';
+import 'package:unittest/unittest.dart';
 
-import '../../lib/core.dart';
+import 'package:okoboji/core.dart';
 
 final _rnd = new math.Random();
 
