@@ -16,3 +16,24 @@ String parse(String sourceHaml, {HamlFormat format: HamlFormat.HTML5}) {
   // print(result);
   return result.doFormat();
 }
+
+Walker<String, Entry> stringToHamlEntry() {
+  return stringToLines()
+      .chain(linesToIndents())
+      .chain(indentsToTokens())
+      .chain(tokensToEntries(_getHamlEntry));
+}
+
+HamlEntry _getHamlEntry(String value) {
+  var result = _entryParser.parse(value);
+
+  if(!result.isSuccess) {
+    print(result);
+    print(result.message);
+    throw 'boo!';
+  }
+
+  return result.result;
+}
+
+final _entryParser = new HamlEntityParser();

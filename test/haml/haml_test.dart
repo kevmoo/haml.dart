@@ -13,9 +13,17 @@ void main() {
     group(groupName, () {
 
       testMap.forEach((String testName, Map testData) {
-        final data = new _SpecData(testData);
-        test(testName, () {
-          _doTest(data);
+        group(testName, () {
+
+          final data = new _SpecData(testData);
+
+          test('stream', () {
+            _testStream(data);
+          });
+
+          test('full parser', () {
+            _doTest(data);
+          });
         });
       });
 
@@ -25,8 +33,9 @@ void main() {
   final active = ['a simple Haml tag', 'Inline content simple tag',
                   'a tag with colons', 'a tag with underscores',
                   'a tag with PascalCase', 'a tag with camelCase'];
+
   filterTests((TestCase tc) {
-    if(active.any((n) => tc.description.endsWith(n))) {
+    if(active.any((n) => tc.description.contains(n))) {
       return true;
     }
 
@@ -35,6 +44,20 @@ void main() {
     }
     return false;
   });
+}
+
+void _testStream(_SpecData data) {
+  print('\nhaml');
+  print(Error.safeToString(data.haml));
+
+  print('\nhtml');
+  print(data.html);
+
+  final result = stringToHamlEntry().single(data.haml);
+
+  print('\nresult');
+  print(result.map((e) => '$e\t\t${Error.safeToString(e)}').join('\n'));
+
 }
 
 void _doTest(_SpecData data) {
