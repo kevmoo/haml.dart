@@ -16,6 +16,47 @@ Walker<String, Block> stringToBlocks() {
       .chain(tokensToBlocks());
 }
 
+Walker<String, Entry> stringToEntries() {
+  return stringToLines()
+      .chain(linesToIndents())
+      .chain(indentsToTokens())
+      .chain(tokensToEntries());
+}
+
+EntryValue _defaultEntryValueParser(String value) =>
+    new StringEntry(value);
+
+Walker<dynamic, Entry> tokensToEntries([EntryValue parser(String)]) {
+  final List<EntryIndent> stack = new List<EntryIndent>();
+  EntryValue lastValue;
+
+  if(parser == null) {
+    parser = _defaultEntryValueParser;
+  }
+
+  return new Walker<dynamic, Entry>.fromMap((token) {
+    if(token == INDENT) {
+      assert(lastValue != null);
+      var indent = new EntryIndent(lastValue);
+
+      // not strictly required, but should help find bad input streams
+      lastValue = null;
+
+      stack.add(indent);
+      return indent;
+    } else if(token == UNDENT) {
+      // not strictly required, but should help find bad input streams
+      lastValue = null;
+
+      return new EntryUndent(stack.removeLast().entry);
+    }
+
+    assert(token is String);
+
+    return lastValue = parser(token);
+  });
+}
+
 /**
  * Items can only be:
  * an instance of [String]

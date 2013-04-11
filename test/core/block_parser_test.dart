@@ -184,6 +184,13 @@ void _multiRoundTrip(String name, String value) {
     test('prefix grammar', () {
       _testPrefixGrammar(value);
     });
+
+    test('entry stream', () {
+      final walker = stringToEntries();
+      final val = walker.single(value).toList();
+      // TODO: actual validation here?
+      // round trip? Hmm...
+    });
   });
 }
 
