@@ -68,7 +68,7 @@ class _BlockBuilder {
       if(data == INDENT) {
         _builder = new _BlockBuilder();
       } else {
-        var block = new Block(_head, _childBlocks);
+        var block = new Block.raw(_head, _childBlocks);
         if(data == UNDENT) {
           _finished = true;
         } else {

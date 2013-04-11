@@ -33,19 +33,19 @@ void main() {
   group('block parser', () {
 
     test('block equality', () {
-      var block1 = new Block('a', []);
+      var block1 = new Block.raw('a', []);
       expect(block1, equals(block1));
       expect(block1, same(block1));
 
-      var block2 = new Block('a', []);
+      var block2 = new Block.raw('a', []);
       expect(block2, equals(block1));
       expect(block2, isNot(same(block1)));
 
-      var block3 = new Block('test', [new Block('val', [])]);
-      var block4 = new Block('test', [new Block('val', [])]);
+      var block3 = new Block.raw('test', [new Block.raw('val', [])]);
+      var block4 = new Block.raw('test', [new Block.raw('val', [])]);
       expect(block3, equals(block4));
 
-      var block5 = new Block('test', [new Block('val2', [])]);
+      var block5 = new Block.raw('test', [new Block.raw('val2', [])]);
       expect(block5, isNot(equals(block3)));
     });
 

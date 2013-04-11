@@ -12,10 +12,9 @@ class BlockParser extends BlockGrammar {
       String header = each[0];
       List<Block> childBlocks = each[1] == null ? [] : each[1];
 
-      var block = new Block(header, childBlocks);
+      var block = new Block.raw(header, childBlocks);
       return block;
     });
 
   }
 }
-

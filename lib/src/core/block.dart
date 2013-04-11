@@ -1,25 +1,25 @@
 part of core;
 
 class Block {
-  final String header;
+  final EntryValue entry;
   final Sequence<Block> children;
 
-  Block(this.header, [Iterable<Block> items = null]) :
-    this.children = new ReadOnlyCollection(items == null ? [] : items) {
-    requireArgumentNotNullOrEmpty(header, 'header');
-    assert(!IndentLine.isWhite(header.codeUnits.first));
+  factory Block.raw(String header, [Iterable<Block> items = null]) {
+    return new Block(new StringEntry(header), items);
+  }
 
-    // TODO: we might have a model for comments, which makes headers
-    // multi-line. But for now...
-    assert(!header.contains('\n'));
-    assert(!header.contains('\r'));
+  Block(this.entry, [Iterable<Block> items = null]) :
+    this.children = new ReadOnlyCollection(items == null ? [] : items) {
+    requireArgumentNotNull(entry, 'entry');
 
     assert(children != null);
     assert(children.every((b) => b is Block));
   }
 
-  bool operator ==(other) => other is Block && other.header == this.header &&
-        this.children.itemsEqual(other.children);
+  String get header => entry.value;
+
+  bool operator ==(other) => other is Block && entry == other.entry &&
+        children.itemsEqual(other.children);
 
   int getTotalCount() => children.fold(1, (int val, Block child) =>
         val + child.getTotalCount());
