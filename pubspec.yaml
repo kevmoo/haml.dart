@@ -1,7 +1,7 @@
 name: okoboji
 dependencies:
   bot: '>=0.16.3+1'
-  petitparser: '>=0.2.4+m4'
+  petitparser: '>=0.2.5+m4'
   logging: '>=0.4.5+1'
   pathos: '>=0.4.5+1'
   meta: '>=0.4.5+1'
