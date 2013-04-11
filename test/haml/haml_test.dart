@@ -21,9 +21,12 @@ void main() {
             _testStream(data);
           });
 
+          /*
+           * TODO: this is coming back with new hotness soonish
           test('full parser', () {
             _doTest(data);
           });
+          */
         });
       });
 
@@ -39,7 +42,7 @@ void main() {
       return true;
     }
 
-    if(tc.description.contains('headers - ')) {
+    if(tc.description.contains(' - headers - ')) {
       return true;
     }
     return false;
@@ -60,6 +63,7 @@ void _testStream(_SpecData data) {
 
 }
 
+/* TODO: this is coming back
 void _doTest(_SpecData data) {
   // print(data.haml);
   // print(data.html);
@@ -67,6 +71,7 @@ void _doTest(_SpecData data) {
   expect(parseResult, equals(data.html),
       reason: data.haml);
 }
+*/
 
 class _SpecData {
   final String haml;

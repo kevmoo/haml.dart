@@ -1,5 +1,6 @@
 part of haml;
 
+/*
 class HamlParser extends HamlGrammar {
   final HamlFormat format;
 
@@ -50,3 +51,4 @@ class HamlParser extends HamlGrammar {
 
   }
 }
+*/
