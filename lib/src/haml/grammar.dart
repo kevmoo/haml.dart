@@ -24,7 +24,7 @@ class HamlGrammar extends CompositeParser {
         .permute([1,2]));
 
     def('nameToken', ref('nameStartChar')
-      .seq(ref('nameStartChar').star())
+      .seq(ref('nameChar').star())
       .flatten());
     def('nameStartChar', pattern(xmlp.XmlGrammar.NAME_START_CHARS));
     def('nameChar', pattern(xmlp.XmlGrammar.NAME_CHARS));
