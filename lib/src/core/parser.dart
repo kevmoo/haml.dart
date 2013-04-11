@@ -1,5 +1,7 @@
 part of core;
 
+// TODO: get rid of this, right?
+
 class BlockParser extends BlockGrammar {
 
   void initialize() {

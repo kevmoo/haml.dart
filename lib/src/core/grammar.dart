@@ -1,5 +1,7 @@
 part of core;
 
+// TODO: get rid of this, right?
+
 class BlockGrammar extends CompositeParser {
 
   static final _indentStr = new String.fromCharCode(_indentUnit);
