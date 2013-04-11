@@ -127,41 +127,6 @@ void main() {
   });
 }
 
-void _testPrefixGrammar(String value) {
-  final blocks = Block.getBlocks(value).toList();
-
-  /*
-  print('*old blocks');
-  print(blocks);
-  print(Error.safeToString(Block.getString(blocks)));
-  */
-
-  final prefixedVal = Block.getPrefixedString(blocks);
-
-  final grammar = new BlockParser();
-  Result thing = grammar.parse(prefixedVal);
-
-  if(thing is Failure) {
-    String buffer = thing.buffer;
-    if(buffer.startsWith('-#')) {
-      // TODO: support comments!
-      print('Ignoring comments for now.');
-      return;
-    }
-    fail(thing.toString());
-  }
-
-  List<Block> newBlocks = thing.result;
-
-  /*
-  print('*new blocks');
-  print(newBlocks);
-  print(Error.safeToString(Block.getString(newBlocks)));
-  */
-
-  expect(newBlocks, orderedEquals(blocks));
-}
-
 void _multiRoundTrip(String name, String value) {
   group(name, () {
     test('getBlocks', () {
@@ -180,9 +145,6 @@ void _multiRoundTrip(String name, String value) {
       test('tab x 3', () {
         _roundTrip(value, '\t'.codeUnits.single, 3);
       });
-    });
-    test('prefix grammar', () {
-      _testPrefixGrammar(value);
     });
 
     test('entry stream', () {
