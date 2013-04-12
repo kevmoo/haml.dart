@@ -8,7 +8,19 @@ class HamlEntityGrammar extends CompositeParser {
     def('entity', ref('doctype').or(ref('element')));
 
     def('element', ref('named-element').or(ref('implicit-div-element'))
+        .seq(ref('self-closing'))
         .seq(ref('content').optional()));
+
+    def('self-closing', char('/').optional()
+        .map((String char) {
+          if(char == null) {
+            return false;
+          } else if (char == '/') {
+            return true;
+          } else {
+            throw 'not a valid value';
+          }
+        }));
 
     def('implicit-div-element', ref('id-def').or(ref('class-def')).plus());
 
@@ -51,15 +63,19 @@ class HamlEntityParser extends HamlEntityGrammar {
 
     action('doctype', (value) => new DocTypeEntry(value));
     action('element', (List value) {
-      print('parsing element: $value');
-      assert(value.length == 2);
+      assert(value.length == 3);
 
       List head = value[0];
       assert(head.length == 2);
       String name = head[0];
 
       // TODO: actually support content
-      Map idAndClassValues = head[1];
+      Map<String, List<String>> idAndClassValues = head[1];
+
+
+      final isSelfClosing = value[1];
+
+      final content = value[2];
 
       return new ElementEntry(name);
     });
