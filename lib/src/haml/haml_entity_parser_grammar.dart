@@ -1,26 +1,38 @@
 part of haml;
 
+class _HamlEnum {
+  final String value;
+  const _HamlEnum(this.value);
+  String toString() => '* $value *';
+}
+
+class _SpecialInstruction extends _HamlEnum {
+  static const _SpecialInstruction SELF_CLOSING =
+      const _SpecialInstruction('self-closing');
+
+  static const _SpecialInstruction REMOVE_WHITESPACE_SURROUNDING =
+      const _SpecialInstruction('remove-whitespace-surrounding');
+
+  static const _SpecialInstruction REMOVE_WHITESPACE_WITHIN =
+      const _SpecialInstruction('remove-whitespace-within');
+
+  const _SpecialInstruction(String value) : super(value);
+}
+
 class HamlEntityGrammar extends CompositeParser {
 
   void initialize() {
     def('start', ref('entity').end());
 
-    def('entity', ref('doctype').or(ref('element')));
+    def('entity', ref('doctype').or(ref('element')).or(ref('text')));
 
     def('element', ref('named-element').or(ref('implicit-div-element'))
-        .seq(ref('self-closing'))
+        .seq(ref('special-instructions').optional())
         .seq(ref('content').optional()));
 
-    def('self-closing', char('/').optional()
-        .map((String char) {
-          if(char == null) {
-            return false;
-          } else if (char == '/') {
-            return true;
-          } else {
-            throw 'not a valid value';
-          }
-        }));
+    def('text', any().star().flatten());
+
+    def('special-instructions', char('/').or(char('>')).or(char('<')));
 
     def('implicit-div-element', ref('id-def').or(ref('class-def')).plus());
 
@@ -73,7 +85,7 @@ class HamlEntityParser extends HamlEntityGrammar {
       Map<String, List<String>> idAndClassValues = head[1];
 
 
-      final isSelfClosing = value[1];
+      final specialInstructions = value[1];
 
       final content = value[2];
 
@@ -106,11 +118,26 @@ class HamlEntityParser extends HamlEntityGrammar {
 
       return [name, values];
     });
+
+    action('text', (String value) {
+      return new StringEntry(value);
+    });
   }
 }
 
 abstract class HamlEntry implements EntryValue {
 
+}
+
+class StringEntry implements HamlEntry {
+  final String value;
+
+  StringEntry(this.value) {
+    assert(value != null);
+  }
+
+  @override
+  String toString() => value;
 }
 
 class ElementEntry implements HamlEntry {
