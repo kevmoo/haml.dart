@@ -35,16 +35,14 @@ void main() {
 
   final active = ['a simple Haml tag', 'Inline content simple tag',
                   'a tag with colons', 'a tag with underscores',
-                  'a tag with PascalCase', 'a tag with camelCase'];
+                  'a tag with PascalCase', 'a tag with camelCase',
+                  ' - headers ', 'basic Haml tags and CSS'];
 
   filterTests((TestCase tc) {
     if(active.any((n) => tc.description.contains(n))) {
       return true;
     }
 
-    if(tc.description.contains(' - headers - ')) {
-      return true;
-    }
     return false;
   });
 }
