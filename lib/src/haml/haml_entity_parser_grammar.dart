@@ -7,10 +7,22 @@ class HamlEntityGrammar extends CompositeParser {
 
     def('entity', ref('doctype').or(ref('element')));
 
-    def('element', char('%')
-        .seq(ref('nameToken'))
-        .seq(ref('content').optional())
-        .permute([1,2]));
+    def('element', ref('named-element').or(ref('implicit-div-element'))
+        .seq(ref('content').optional()));
+
+    def('implicit-div-element', ref('id-def').or(ref('class-def')).plus());
+
+    def('named-element', ref('element-name')
+        .seq(ref('id-def').or(ref('class-def')).star()));
+
+    def('id-def', char('#').seq(ref('css-name')));
+
+    def('class-def', char('.').seq(ref('css-name')));
+
+    def('element-name', char('%').seq(ref('nameToken')));
+
+    // TODO: this is likely wrong for css names. Need to investigate.
+    def('css-name', ref('nameToken'));
 
     def('content', ref('spaces').seq(any().star().flatten()).pick(1));
 
@@ -39,10 +51,44 @@ class HamlEntityParser extends HamlEntityGrammar {
 
     action('doctype', (value) => new DocTypeEntry(value));
     action('element', (List value) {
+      print('parsing element: $value');
       assert(value.length == 2);
 
+      List head = value[0];
+      assert(head.length == 2);
+      String name = head[0];
+
       // TODO: actually support content
-      return new ElementEntry(value[0]);
+      Map idAndClassValues = head[1];
+
+      return new ElementEntry(name);
+    });
+
+    action('implicit-div-element', (List value) {
+      assert(!value.isEmpty);
+      Map<String, dynamic> values = { 'ids': [], 'classes': [] };
+
+      // TODO: actually populate the ids and classes
+      // TODO: share code w/ named-element when we get there
+
+      return ['div', values];
+    });
+
+    action('named-element', (List value) {
+      assert(value.length == 2);
+      List namedList = value[0];
+      assert(namedList.length == 2);
+      assert(namedList[0] == '%');
+
+      String name = namedList[1];
+      assert(name != null && !name.isEmpty);
+
+      var values = { };
+
+      // TODO: actually populate the ids and classes
+      // TODO: share code w/ implicit-div-element when we get there
+
+      return [name, values];
     });
   }
 }
