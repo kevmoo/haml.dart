@@ -1,11 +1,14 @@
 library test.block_parser;
 
+import 'dart:math' as math;
 import 'package:petitparser/petitparser.dart';
 import 'package:unittest/unittest.dart';
 
 import 'package:okoboji/core.dart';
 
 import '../test_shared.dart';
+
+final _rnd = new math.Random();
 
 void main() {
 
@@ -127,24 +130,21 @@ void main() {
   });
 }
 
+final _spaceCodeUnit = ' '.codeUnits.single;
+final _tabCodeUnit = '\t'.codeUnits.single;
+
 void _multiRoundTrip(String name, String value) {
   group(name, () {
     test('getBlocks', () {
       expect(() => Block.getBlocks(value).toList(), returnsNormally);
     });
-    group('roundtrip', () {
-      test('space x 2', () {
-        _roundTrip(value, ' '.codeUnits.single, 2);
-      });
-      test('space x 1', () {
-        _roundTrip(value, ' '.codeUnits.single, 1);
-      });
-      test('tab x 1', () {
-        _roundTrip(value, '\t'.codeUnits.single, 1);
-      });
-      test('tab x 3', () {
-        _roundTrip(value, '\t'.codeUnits.single, 3);
-      });
+
+    var char = ['tab','space'].elementAt(_rnd.nextInt(2));
+    var count = _rnd.nextInt(3) + 1;
+
+    test('roundtrip $char x $count', () {
+      var charUnit = char == 'tab' ? _tabCodeUnit : _spaceCodeUnit;
+      _roundTrip(value, charUnit, count);
     });
 
     test('entry stream', () {
