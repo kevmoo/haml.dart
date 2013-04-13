@@ -5,7 +5,7 @@ import 'package:bot/bot.dart';
 import 'package:meta/meta.dart';
 import 'package:petitparser/petitparser.dart';
 
-import 'package:bot/bot_io.dart';
+import 'package:bot_io/bot_io.dart';
 import 'util.dart';
 
 part 'src/core/block.dart';

@@ -1,6 +1,6 @@
 library util;
 
-import 'package:bot/bot_io.dart';
+import 'package:bot_io/bot_io.dart';
 
 void log(value, [AnsiColor color = AnsiColor.RED]) {
   if(value is List) {
