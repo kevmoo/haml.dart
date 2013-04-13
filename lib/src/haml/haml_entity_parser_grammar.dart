@@ -27,8 +27,21 @@ class HamlEntityGrammar extends CompositeParser {
     def('entity', ref('doctype').or(ref('element')).or(ref('text')));
 
     def('element', ref('named-element').or(ref('implicit-div-element'))
+        .seq(ref('attributes').optional())
         .seq(ref('special-instructions').optional())
         .seq(ref('content').optional()));
+
+    def('attributes', ref('html-attributes').or(ref('ruby-attributes')));
+
+    def('html-attributes', char('(')
+        .seq(char(')').neg().star())
+        .seq(char(')'))
+        .flatten());
+
+    def('ruby-attributes', char('{')
+        .seq(char('}').neg().star())
+        .seq(char('}'))
+        .flatten());
 
     def('text', any().star().flatten());
 
@@ -71,7 +84,7 @@ class HamlEntityParser extends HamlEntityGrammar {
 
     action('doctype', (value) => new DocTypeEntry(value));
     action('element', (List value) {
-      assert(value.length == 3);
+      assert(value.length == 4);
 
       List head = value[0];
       assert(head.length == 2);
@@ -80,10 +93,11 @@ class HamlEntityParser extends HamlEntityGrammar {
       // TODO: actually support content
       Map<String, List<String>> idAndClassValues = head[1];
 
+      final String attributes = value[1];
 
-      final specialInstructions = value[1];
+      final specialInstructions = value[2];
 
-      final content = value[2];
+      final content = value[3];
 
       return new ElementEntry(name);
     });
