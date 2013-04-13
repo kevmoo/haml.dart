@@ -6,9 +6,11 @@ import 'package:petitparser/xml.dart' as xmlp;
 import 'package:okoboji/core.dart';
 
 part 'src/haml/haml_format.dart';
-part 'src/haml/parser.dart';
-part 'src/haml/nodes.dart';
 part 'src/haml/haml_entity_parser_grammar.dart';
+part 'src/haml/html_entry.dart';
+part 'src/haml/html_writer.dart';
+part 'src/haml/nodes.dart';
+part 'src/haml/parser.dart';
 
 /*
  * TODO: this is coming back...with new hotness
@@ -27,7 +29,7 @@ Walker<String, Entry> stringToHamlEntry() {
       .chain(tokensToEntries(_getHamlEntry));
 }
 
-HamlEntry _getHamlEntry(String value) {
+HtmlEntry _getHamlEntry(String value) {
   var result = _entryParser.parse(value);
 
   if(!result.isSuccess) {
