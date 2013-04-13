@@ -1,6 +1,7 @@
 library test.haml;
 
 import 'package:unittest/unittest.dart';
+import 'package:okoboji/core.dart';
 import 'package:okoboji/haml.dart';
 import '../test_shared.dart';
 
@@ -42,6 +43,7 @@ void main() {
                   'tags with unusual'];
 
   filterTests((TestCase tc) {
+    return true;
     if(active.any((n) => tc.description.contains(n))) {
       return true;
     }
@@ -54,15 +56,20 @@ void main() {
 
 void _testStream(_SpecData data) {
   print('\nhaml');
-  print(Error.safeToString(data.haml));
+  print(data.haml);
 
   print('\nhtml');
   print(data.html);
 
-  final result = stringToHamlEntry().single(data.haml);
+  final List<Entry> result = stringToHamlEntry().single(data.haml).toList();
 
-  print('\nresult');
-  print(result.map((e) => '$e\t\t${Error.safeToString(e)}').join('\n'));
+  final List<String> lines = htmlEntryToHtml().map(result).toList();
+
+  final value = lines.join();
+  print("**VALUE**");
+  print(value);
+
+  expect(value, equals(data.html));
 
 }
 

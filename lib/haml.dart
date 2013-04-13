@@ -1,9 +1,14 @@
 library haml;
 
+import 'dart:async';
+
 import 'package:meta/meta.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/xml.dart' as xmlp;
 import 'package:okoboji/core.dart';
+
+import 'package:bot_io/bot_io.dart';
+import 'package:okoboji/util.dart' as util;
 
 part 'src/haml/haml_format.dart';
 part 'src/haml/haml_entity_parser_grammar.dart';
@@ -22,6 +27,7 @@ String parse(String sourceHaml, {HamlFormat format: HamlFormat.HTML5}) {
 }
 */
 
+// TODO: rename this to stringToHtmlEntry, right?
 Walker<String, Entry> stringToHamlEntry() {
   return stringToLines()
       .chain(linesToIndents())
