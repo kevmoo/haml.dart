@@ -35,14 +35,31 @@ class ElementEntry implements HtmlEntry {
 }
 
 class DocTypeEntry implements HtmlEntry {
-  final String value;
+  final String label;
 
-  DocTypeEntry([this.value]) {
-    assert(value == null || !value.startsWith('!'));
+  DocTypeEntry([this.label]) {
+    assert(label == null || !label.startsWith('!'));
+  }
+
+  String formatLabel(HamlFormat format) {
+    if(format == HamlFormat.XHTML && label == 'XML') {
+      return "<?xml version='1.0' encoding='utf-8' ?>";
+    }
+
+    final parseVal = getDocType(format, label);
+
+    if(parseVal == null) {
+      return '';
+    }
+
+    return "<!DOCTYPE$parseVal>";
   }
 
   @override
-  String toString() => value == null ? '!!!' : '!!! $value';
+  String get value => label == null ? '!!!' : '!!! $label';
+
+  @override
+  String toString() => value;
 
   static String getDocType(HamlFormat format, String label) {
     switch(format) {

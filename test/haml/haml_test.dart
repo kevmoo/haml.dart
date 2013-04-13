@@ -63,7 +63,8 @@ void _testStream(_SpecData data) {
 
   final List<Entry> result = stringToHamlEntry().single(data.haml).toList();
 
-  final List<String> lines = htmlEntryToHtml().map(result).toList();
+  final List<String> lines = htmlEntryToHtml(format: data.format)
+      .map(result).toList();
 
   final value = lines.join();
   print("**VALUE**");

@@ -1,6 +1,6 @@
 part of haml;
 
-Walker<Entry, String> htmlEntryToHtml() {
+Walker<Entry, String> htmlEntryToHtml({HamlFormat format: HamlFormat.HTML5}) {
   final _log = (val) => util.log(val, AnsiColor.GREEN);
 
   final indentChar = ' ';
@@ -30,8 +30,7 @@ Walker<Entry, String> htmlEntryToHtml() {
 
           lastEntry = null;
 
-        } else {
-          assert(data is HtmlEntry);
+        } else if(data is ElementEntry) {
 
           if(lastEntry != null) {
             sink.add('\n');
@@ -46,6 +45,13 @@ Walker<Entry, String> htmlEntryToHtml() {
 
           sink.add("<${data.value}>");
 
+        } else if (data is DocTypeEntry) {
+          lastEntry = data;
+          sink.add(data.formatLabel(format));
+
+        } else {
+          assert(data is HtmlEntry);
+          throw 'not supported - ${Error.safeToString(data)}';
         }
       },
       handleDone: (EventSink<String> sink) {
