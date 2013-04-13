@@ -17,15 +17,21 @@ class StringEntry implements HtmlEntry {
 }
 
 class ElementEntry implements HtmlEntry {
-  final String value;
+  final String name;
 
-  ElementEntry(this.value) {
-    assert(!value.startsWith('%'));
+  String get value => name;
+
+  ElementEntry(this.name) {
+    assert(elementNameParser.accept(name));
   }
 
-
   @override
-  String toString() => '<$value>';
+  String toString() => '<$name>';
+
+  static final Parser elementNameParser =
+      pattern(xmlp.XmlGrammar.NAME_START_CHARS)
+      .seq(pattern(xmlp.XmlGrammar.NAME_CHARS).star())
+      .flatten();
 }
 
 class DocTypeEntry implements HtmlEntry {

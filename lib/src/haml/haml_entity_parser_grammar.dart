@@ -50,11 +50,7 @@ class HamlEntityGrammar extends CompositeParser {
 
     def('content', ref('spaces').seq(any().star().flatten()).pick(1));
 
-    def('nameToken', ref('nameStartChar')
-      .seq(ref('nameChar').star())
-      .flatten());
-    def('nameStartChar', pattern(xmlp.XmlGrammar.NAME_START_CHARS));
-    def('nameChar', pattern(xmlp.XmlGrammar.NAME_CHARS));
+    def('nameToken', ElementEntry.elementNameParser);
 
     def('doctype', string('!!!')
         .seq(ref('spaces')
