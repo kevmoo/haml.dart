@@ -1,6 +1,7 @@
 library core;
 
 import 'dart:async';
+import 'dart:collection';
 import 'package:bot/bot.dart';
 import 'package:meta/meta.dart';
 import 'package:petitparser/petitparser.dart';

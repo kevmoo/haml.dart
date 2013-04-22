@@ -3,7 +3,7 @@ part of core;
 // TODO: yeah, all of this should be in the BOT
 
 typedef void _handleData<S, T>(S data, EventSink<T> sink);
-typedef void _handleError<T>(AsyncError error, EventSink<T> sink);
+typedef void _handleError<T>(error, EventSink<T> sink);
 typedef void _handleDone<T>(EventSink<T> sink);
 
 // TODO: ponder Walker.fromExpand ... with an onDone method
@@ -118,7 +118,7 @@ class _ChainedWalker<S, T> extends Walker<S, T> {
   }
 }
 
-class _WalkerIterable<S, T> extends Iterable<T> {
+class _WalkerIterable<S, T> extends IterableBase<T> {
   final Iterable<S> _source;
   final _WalkerImpl<S, T> _parent;
 
@@ -185,8 +185,8 @@ class _SillySink<T> implements EventSink<T> {
   }
 
   @override
-  void addError(AsyncError e) {
+  void addError(error) {
     assert(!_done);
-    throw e;
+    throw error;
   }
 }
