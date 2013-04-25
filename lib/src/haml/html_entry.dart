@@ -3,6 +3,30 @@ part of haml;
 
 abstract class HtmlEntry implements EntryValue {
 
+  void write(HamlFormat format, EventSink<String> sink, Entry next);
+
+  void close(HamlFormat format, EventSink<String> sink) {
+    throw 'not supported';
+  }
+
+  static void writeEntry(HamlFormat format, EventSink<String> sink,
+                         Entry current, Entry next) {
+    if(current is HtmlEntry) {
+      // NOTE: this should be fine. Editor type analysis fail
+      current.write(format, sink, next);
+    } else {
+      throw 'not sure what to do here...';
+    }
+  }
+
+  static void closeEntry(HamlFormat format, EventSink<String> sink,
+                         Entry current) {
+    if(current is HtmlEntry) {
+      current.close(format, sink);
+    } else {
+      throw 'not supported?';
+    }
+  }
 }
 
 class StringEntry implements HtmlEntry {
@@ -18,15 +42,62 @@ class StringEntry implements HtmlEntry {
 
 class ElementEntry implements HtmlEntry {
   final String name;
+  final bool selfClosing;
 
   String get value => name;
 
-  ElementEntry(this.name) {
+  ElementEntry(String name, {bool selfClosing}) :
+    this.name = name,
+    this.selfClosing = (selfClosing == null) ?
+        _isSelfClosingTag(name) : selfClosing {
     assert(elementNameParser.accept(name));
   }
 
   @override
   String toString() => '<$name>';
+
+  @override
+  void write(HamlFormat format, EventSink<String> sink, Entry next) {
+    sink.add("<${name}");
+    if(next is EntryIndent) {
+      // close out the tag with a newline
+      sink.add(">\n");
+    } else if(next == null || next is EntryUndent) {
+      // close out the tag as a solo tag -- format dependant
+
+      if(!selfClosing) {
+        sink.add("></${name}>");
+      } else {
+        switch(format) {
+          case HamlFormat.HTML5:
+            sink.add(">");
+            break;
+          case HamlFormat.XHTML:
+            sink.add(" />");
+            break;
+          case HamlFormat.HTML4:
+            sink.add(">");
+            break;
+          default:
+            throw 'have not got around to $format yet';
+        }
+      }
+
+      //sink.add("<${value}></${value}>");
+    } else {
+      throw 'dude...uh..next... $next';
+    }
+  }
+
+  @override
+  void close(HamlFormat format, EventSink<String> sink) {
+    sink.add("</${value}>");
+  }
+
+  static bool _isSelfClosingTag(String tag) {
+    const _selfClosing = const ['meta'];
+    return _selfClosing.contains(tag);
+  }
 
   static final Parser elementNameParser =
       pattern(xmlp.XmlGrammar.NAME_START_CHARS)
@@ -53,6 +124,14 @@ class DocTypeEntry implements HtmlEntry {
     }
 
     return "<!DOCTYPE$parseVal>";
+  }
+
+  @override
+  void write(HamlFormat format, EventSink<String> sink, Entry next) {
+    assert(next is! EntryIndent);
+    sink.add(formatLabel(format));
+
+    // TODO: if next != null, write newline?
   }
 
   @override

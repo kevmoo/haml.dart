@@ -97,9 +97,14 @@ class HamlEntityParser extends HamlEntityGrammar {
 
       final specialInstructions = value[2];
 
+      bool selfClosing = null;
+      if(specialInstructions == '/') {
+        selfClosing = true;
+      }
+
       final content = value[3];
 
-      return new ElementEntry(name);
+      return new ElementEntry(name, selfClosing: selfClosing);
     });
 
     action('implicit-div-element', (List value) {
