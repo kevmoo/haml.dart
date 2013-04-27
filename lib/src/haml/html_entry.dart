@@ -5,7 +5,7 @@ abstract class HtmlEntry implements EntryValue {
 
   void write(HamlFormat format, EventSink<String> sink, Entry next);
 
-  void close(HamlFormat format, EventSink<String> sink) {
+  void close(HamlFormat format, EventSink<String> sink, Entry next) {
     throw 'not supported';
   }
 
@@ -20,9 +20,9 @@ abstract class HtmlEntry implements EntryValue {
   }
 
   static void closeEntry(HamlFormat format, EventSink<String> sink,
-                         Entry current) {
+                         Entry current, Entry next) {
     if(current is HtmlEntry) {
-      current.close(format, sink);
+      current.close(format, sink, next);
     } else {
       throw 'not supported?';
     }
@@ -85,16 +85,20 @@ class ElementEntry implements HtmlEntry {
             throw 'have not got around to $format yet';
         }
       }
-
-      //sink.add("<${value}></${value}>");
+      if(next != null) {
+        sink.add('\n');
+      }
     } else {
       throw 'dude...uh..next... $next';
     }
   }
 
   @override
-  void close(HamlFormat format, EventSink<String> sink) {
+  void close(HamlFormat format, EventSink<String> sink, Entry next) {
     sink.add("</${value}>");
+    if(next != null) {
+      sink.add('\n');
+    }
   }
 
   String _getAttributeString() {

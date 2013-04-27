@@ -23,7 +23,7 @@ Walker<Entry, String> htmlEntryToHtml({HamlFormat format: HamlFormat.HTML5}) {
         sink.add(indentChar);
       }
 
-      HtmlEntry.closeEntry(format, sink, lastLevel);
+      HtmlEntry.closeEntry(format, sink, lastLevel, next);
     } else {
 
       for(int i = 0; i < (indentCount * levels.length); i++) {
@@ -48,10 +48,12 @@ Walker<Entry, String> htmlEntryToHtml({HamlFormat format: HamlFormat.HTML5}) {
         }
       },
       handleDone: (EventSink<String> sink) {
-        assert(levels.isEmpty);
+        assert(levels.length <= 1);
         if(previous != null) {
           lookAhead(sink, previous, null);
           previous = null;
+        } else {
+          assert(levels.isEmpty);
         }
         sink.close();
       });
