@@ -154,7 +154,13 @@ class HamlEntityParser extends HamlEntityGrammar {
 
           var attrValue = content[1];
 
-          idAndClassValues[attrName] = attrValue;
+          var existingValue = idAndClassValues[attrName];
+          if(existingValue is List) {
+            existingValue.add(attrValue);
+            existingValue.sort();
+          } else {
+            idAndClassValues[attrName] = attrValue;
+          }
 
         });
       }
