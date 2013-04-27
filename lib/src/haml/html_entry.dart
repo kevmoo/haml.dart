@@ -37,6 +37,18 @@ class StringEntry implements HtmlEntry {
   }
 
   @override
+  void write(HamlFormat format, EventSink<String> sink, Entry next) {
+    if(next is EntryIndent) {
+      throw 'not supported';
+    }
+
+    sink.add(value);
+    if(next != null) {
+      sink.add('\n');
+    }
+  }
+
+  @override
   String toString() => value;
 }
 
