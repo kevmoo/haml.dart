@@ -21,6 +21,17 @@ class _SpecialInstruction extends _HamlEnum {
 
 class HamlEntityGrammar extends CompositeParser {
 
+  static final Parser hamlElementNameParser =
+      pattern(xmlp.XmlGrammar.NAME_START_CHARS)
+      .seq(pattern(NAME_CHARS_SANS_PERIOD).star())
+      .flatten();
+
+  // HAML names are valid XML names, EXCEPT period (.) has special meaning
+  // as a definer of classes
+  static final String NAME_CHARS_SANS_PERIOD =
+      '-0-9\u00B7\u0300-\u036F\u203F-\u2040'
+      '${xmlp.XmlGrammar.NAME_START_CHARS}';
+
   void initialize() {
     def('start', ref('entity').end());
 
@@ -63,7 +74,7 @@ class HamlEntityGrammar extends CompositeParser {
 
     def('content', ref('spaces').seq(any().star().flatten()).pick(1));
 
-    def('nameToken', ElementEntry.elementNameParser);
+    def('nameToken', hamlElementNameParser);
 
     def('doctype', string('!!!')
         .seq(ref('spaces')
@@ -94,6 +105,7 @@ class HamlEntityParser extends HamlEntityGrammar {
       Map<String, List<String>> idAndClassValues = head[1];
 
       final String attributes = value[1];
+      // TODO: at some point need to merge classes and ids here, but for now...
 
       final specialInstructions = value[2];
 
@@ -104,15 +116,13 @@ class HamlEntityParser extends HamlEntityGrammar {
 
       final content = value[3];
 
-      return new ElementEntry(name, selfClosing: selfClosing);
+      return new ElementEntry(name, idAndClassValues, selfClosing: selfClosing);
     });
 
     action('implicit-div-element', (List value) {
       assert(!value.isEmpty);
-      Map<String, dynamic> values = { 'ids': [], 'classes': [] };
 
-      // TODO: actually populate the ids and classes
-      // TODO: share code w/ named-element when we get there
+      var values = _parseClassesAndIds(value);
 
       return ['div', values];
     });
@@ -126,10 +136,7 @@ class HamlEntityParser extends HamlEntityGrammar {
       String name = namedList[1];
       assert(name != null && !name.isEmpty);
 
-      var values = { };
-
-      // TODO: actually populate the ids and classes
-      // TODO: share code w/ implicit-div-element when we get there
+      var values = _parseClassesAndIds(value[1]);
 
       return [name, values];
     });
@@ -137,5 +144,31 @@ class HamlEntityParser extends HamlEntityGrammar {
     action('text', (String value) {
       return new StringEntry(value);
     });
+  }
+
+  static Map<String, dynamic> _parseClassesAndIds(List<String> source) {
+    Map<String, dynamic> values = { };
+
+    source.forEach((List<String> content) {
+      assert(content.length == 2);
+      final String tag = content[0];
+
+      // TODO: assert valid namey thing?
+      final String value = content[1];
+      switch(tag) {
+        case '#':
+          values['id'] = value;
+          break;
+        case '.':
+          final classArray = values.putIfAbsent('class', () => []);
+          classArray.add(value);
+          break;
+        default:
+          throw 'provided prefix value "$tag" is not supported';
+      }
+
+    });
+
+    return values;
   }
 }

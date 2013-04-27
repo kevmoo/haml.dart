@@ -43,11 +43,14 @@ class StringEntry implements HtmlEntry {
 class ElementEntry implements HtmlEntry {
   final String name;
   final bool selfClosing;
+  final Map<String, dynamic> _attributes;
 
   String get value => name;
 
-  ElementEntry(String name, {bool selfClosing}) :
+  ElementEntry(String name, Map<String, dynamic> attributes,
+      {bool selfClosing}) :
     this.name = name,
+    this._attributes = attributes,
     this.selfClosing = (selfClosing == null) ?
         _isSelfClosingTag(name) : selfClosing {
     assert(elementNameParser.accept(name));
@@ -58,7 +61,7 @@ class ElementEntry implements HtmlEntry {
 
   @override
   void write(HamlFormat format, EventSink<String> sink, Entry next) {
-    sink.add("<${name}");
+    sink.add("<${name}${_getAttributeString()}");
     if(next is EntryIndent) {
       // close out the tag with a newline
       sink.add(">\n");
@@ -92,6 +95,26 @@ class ElementEntry implements HtmlEntry {
   @override
   void close(HamlFormat format, EventSink<String> sink) {
     sink.add("</${value}>");
+  }
+
+  String _getAttributeString() {
+    final buffer = new StringBuffer();
+    // first, must be ordered
+    final sortedKeys = _attributes.keys
+        .toList()..sort();
+
+    sortedKeys.forEach((String key) {
+      var value = _attributes[key];
+      if(value is List) {
+        assert(!value.isEmpty);
+        value = value.join(' ');
+      }
+      assert(value is String);
+
+      buffer.write(" $key='$value'");
+    });
+
+    return buffer.toString();
   }
 
   static bool _isSelfClosingTag(String tag) {
