@@ -19,6 +19,16 @@ class _SpecialInstruction extends _HamlEnum {
   const _SpecialInstruction(String value) : super(value);
 }
 
+class VariableReference {
+  final String value;
+
+  VariableReference(this.value) {
+    assert(HamlEntityGrammar.hamlElementNameParser.accept(value));
+  }
+
+  String toString() => 'VariableReference: $value';
+}
+
 class HamlEntityGrammar extends CompositeParser {
 
   static final Parser hamlElementNameParser =
@@ -49,9 +59,37 @@ class HamlEntityGrammar extends CompositeParser {
     def('attributes', ref('html-attributes').or(ref('ruby-attributes')));
 
     def('html-attributes', char('(')
-        .seq(char(')').neg().star())
+        .seq(ref('spaces').optional())
+        .seq(ref('html-attribute')
+            .separatedBy(ref('spaces'), includeSeparators: false, optionalSeparatorAtEnd: true))
         .seq(char(')'))
-        .flatten());
+        .pick(2));
+
+    def('html-attribute', ref('attribute-name')
+        .seq(ref('spaces').optional())
+        .seq(char('='))
+        .seq(ref('spaces').optional())
+        .seq(ref('quoted-value').or(ref('unquoted-value')))
+        .permute([0, 4])
+        );
+
+    // TODO: a good start, but probably not right
+    def('attribute-name', ref('nameToken'));
+
+    def('quoted-value', ref('single-quoted-value')
+        .or(ref('double-quoted-value'))
+        .pick(1));
+
+    def('single-quoted-value', char("'")
+        .seq(char("'").neg().star().flatten())
+        .seq(char("'")));
+
+    def('double-quoted-value', char('"')
+        .seq(char('"').neg().star().flatten())
+        .seq(char('"')));
+
+    // TODO: a good start, but probably not right
+    def('unquoted-value', ref('nameToken'));
 
     def('ruby-attributes', char('{')
         .seq(char('}').neg().star())
@@ -104,11 +142,22 @@ class HamlEntityParser extends HamlEntityGrammar {
       assert(head.length == 2);
       String name = head[0];
 
-      // TODO: actually support content
-      Map<String, List<String>> idAndClassValues = head[1];
+      // value is either String or list of String
+      Map<String, dynamic> idAndClassValues = head[1];
 
-      final String attributes = value[1];
-      // TODO: at some point need to merge classes and ids here, but for now...
+      final attributesArray = value[1];
+
+      if(attributesArray != null) {
+        attributesArray.forEach((List content) {
+          assert(content.length == 2);
+          String attrName = content[0];
+
+          var attrValue = content[1];
+
+          idAndClassValues[attrName] = attrValue;
+
+        });
+      }
 
       final specialInstructions = value[2];
 
@@ -151,6 +200,10 @@ class HamlEntityParser extends HamlEntityGrammar {
 
     action('text', (String value) {
       return new StringEntry(value);
+    });
+
+    action('unquoted-value', (String value) {
+      return new VariableReference(value);
     });
   }
 
