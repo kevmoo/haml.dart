@@ -26,6 +26,10 @@ class HamlEntityGrammar extends CompositeParser {
       .seq(pattern(NAME_CHARS_SANS_PERIOD).star())
       .flatten();
 
+  // TODO: this is likely wrong for css names. Need to investigate.
+  static final Parser hamlClassNameParser =
+      pattern(NAME_CHARS_SANS_PERIOD).plus().flatten();
+
   // HAML names are valid XML names, EXCEPT period (.) has special meaning
   // as a definer of classes
   static final String NAME_CHARS_SANS_PERIOD =
@@ -69,8 +73,7 @@ class HamlEntityGrammar extends CompositeParser {
 
     def('element-name', char('%').seq(ref('nameToken')));
 
-    // TODO: this is likely wrong for css names. Need to investigate.
-    def('css-name', ref('nameToken'));
+    def('css-name', hamlClassNameParser);
 
     def('content', ref('spaces').seq(any().star().flatten()).pick(1));
 
