@@ -40,6 +40,30 @@ class StringEntry implements HtmlEntry {
   String toString() => value;
 }
 
+class ElementEntryWithSimpleContent extends ElementEntry {
+  final String content;
+
+  ElementEntryWithSimpleContent(String name, Map<String, dynamic> attributes,
+                                this.content) : super(name, attributes);
+
+  @override
+  void write(HamlFormat format, EventSink<String> sink, Entry next) {
+    if(next is EntryIndent) {
+      throw 'not supported';
+    }
+
+    sink.add("<${name}${_getAttributeString()}>$content</${name}>");
+    if(next != null) {
+      sink.add('\n');
+    }
+  }
+
+  @override
+  void close(HamlFormat format, EventSink<String> sink, Entry next) {
+    throw 'not supported';
+  }
+}
+
 class ElementEntry implements HtmlEntry {
   final String name;
   final bool selfClosing;

@@ -119,7 +119,12 @@ class HamlEntityParser extends HamlEntityGrammar {
 
       final content = value[3];
 
-      return new ElementEntry(name, idAndClassValues, selfClosing: selfClosing);
+      if(content == null) {
+        return new ElementEntry(name, idAndClassValues, selfClosing: selfClosing);
+      } else {
+        assert(selfClosing == null);
+        return new ElementEntryWithSimpleContent(name, idAndClassValues, content);
+      }
     });
 
     action('implicit-div-element', (List value) {
