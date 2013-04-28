@@ -25,8 +25,7 @@ class InlineExpression {
         case 'true':
           return true;
         case 'false':
-          // TODO: not sure how to handle false values...yet...hmm...
-          throw 'not sure how to evaluate false here...';
+          return false;
       }
 
       final String result = map[val.value];

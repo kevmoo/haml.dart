@@ -6,4 +6,6 @@
 
 Huge thanks to [Lukas Renggli](http://www.lukas-renggli.ch/) and his [PetitParserDart](https://github.com/renggli/PetitParserDart) library.
 
-Currently passing 61 of 95 [haml-spec](https://github.com/haml/haml-spec) tests.
+Currently passing 63 of 98 [haml-spec - modified](https://github.com/kevmoo/haml-spec) tests.
+
+*Added some tests to haml-spec to keep myself honest in vague cases.*

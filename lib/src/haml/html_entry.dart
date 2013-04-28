@@ -163,8 +163,11 @@ class ElementEntry implements HtmlEntry {
       }
 
       if(value is bool) {
-        // TODO: not sure how to handle false values...yet...hmm...
-        assert(value == true);
+        if(value == false) {
+          // noop. No attribute should be written
+          return;
+        }
+
         if(format == HamlFormat.XHTML) {
           // just print out the key as the value
           value = key;
