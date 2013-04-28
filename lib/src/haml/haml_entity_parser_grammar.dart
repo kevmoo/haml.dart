@@ -103,23 +103,34 @@ class HamlEntityGrammar extends CompositeParser {
     def('ruby-attributes', char('{')
         .seq(ref('spaces').optional())
         .seq(ref('ruby-attribute')
-            .separatedBy(ref('space-comma-space'), includeSeparators: false, optionalSeparatorAtEnd: true))
+            .separatedBy(ref('space-comma-space'), includeSeparators: false))
+        .seq(ref('spaces').optional())
         .seq(char('}'))
         .pick(2));
 
-    def('space-comma-space', ref('spaces').optional()
+    def('space-comma-space',
+        ref('spaces').optional()
         .seq(char(','))
         .seq(ref('spaces').optional()));
 
     def('ruby-attribute',
-        char(':')
-        .seq(ref('attribute-name'))
+        ref('ruby-hash-key')
         .seq(ref('spaces').optional())
         .seq(string('=>'))
         .seq(ref('spaces').optional())
         .seq(ref('quoted-value').or(ref('unquoted-value')))
-        .permute([1, 5])
+        .permute([0, 4])
         );
+
+    def('ruby-hash-key', ref('ruby-hash-colon-key').or(ref('ruby-hash-quoted-key')));
+
+    def('ruby-hash-colon-key', char(':').seq(ref('attribute-name')).pick(1));
+
+    def('ruby-hash-quoted-key', ref('quoted-value'));
+
+    //
+    // and other things...
+    //
 
     def('text', any().star().flatten());
 
