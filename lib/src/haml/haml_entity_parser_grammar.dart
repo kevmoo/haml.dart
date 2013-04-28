@@ -53,22 +53,9 @@ class HamlEntityGrammar extends CompositeParser {
         .seq(ref('special-instructions').optional())
         .seq(ref('content').optional()));
 
-    def('attributes', ref('html-attributes').or(ref('ruby-attributes')));
-
-    def('html-attributes', char('(')
-        .seq(ref('spaces').optional())
-        .seq(ref('html-attribute')
-            .separatedBy(ref('spaces'), includeSeparators: false, optionalSeparatorAtEnd: true))
-        .seq(char(')'))
-        .pick(2));
-
-    def('html-attribute', ref('attribute-name')
-        .seq(ref('spaces').optional())
-        .seq(char('='))
-        .seq(ref('spaces').optional())
-        .seq(ref('quoted-value').or(ref('unquoted-value')))
-        .permute([0, 4])
-        );
+    //
+    // Attribute parsing shared
+    //
 
     // TODO: a good start, but probably not right
     def('attribute-name', ref('nameToken'));
@@ -88,10 +75,51 @@ class HamlEntityGrammar extends CompositeParser {
     // TODO: a good start, but probably not right
     def('unquoted-value', ref('nameToken'));
 
+    def('attributes', ref('html-attributes').or(ref('ruby-attributes')));
+
+    //
+    // HTML attributes  ( a = 'b' ...)
+    //
+
+    def('html-attributes', char('(')
+        .seq(ref('spaces').optional())
+        .seq(ref('html-attribute')
+            .separatedBy(ref('spaces'), includeSeparators: false, optionalSeparatorAtEnd: true))
+        .seq(char(')'))
+        .pick(2));
+
+    def('html-attribute', ref('attribute-name')
+        .seq(ref('spaces').optional())
+        .seq(char('='))
+        .seq(ref('spaces').optional())
+        .seq(ref('quoted-value').or(ref('unquoted-value')))
+        .permute([0, 4])
+        );
+
+    //
+    // Ruby attributes { :a => 'b', ... }
+    //
+
     def('ruby-attributes', char('{')
-        .seq(char('}').neg().star())
+        .seq(ref('spaces').optional())
+        .seq(ref('ruby-attribute')
+            .separatedBy(ref('space-comma-space'), includeSeparators: false, optionalSeparatorAtEnd: true))
         .seq(char('}'))
-        .flatten());
+        .pick(2));
+
+    def('space-comma-space', ref('spaces').optional()
+        .seq(char(','))
+        .seq(ref('spaces').optional()));
+
+    def('ruby-attribute',
+        char(':')
+        .seq(ref('attribute-name'))
+        .seq(ref('spaces').optional())
+        .seq(string('=>'))
+        .seq(ref('spaces').optional())
+        .seq(ref('quoted-value').or(ref('unquoted-value')))
+        .permute([1, 5])
+        );
 
     def('text', any().star().flatten());
 
