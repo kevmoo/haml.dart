@@ -1,11 +1,5 @@
 part of haml;
 
-class _HamlEnum {
-  final String value;
-  const _HamlEnum(this.value);
-  String toString() => '* $value *';
-}
-
 typedef String ExpressionEvaluator(InlineExpression exp);
 
 class InlineExpression {
