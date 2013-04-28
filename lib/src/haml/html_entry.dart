@@ -154,13 +154,20 @@ class ElementEntry implements HtmlEntry {
         assert(!value.isEmpty);
 
         final List<String> vals = value.map((v) => _getValue(eval, v))
-            .toList()
-            ..sort();
+            .toList();
 
-        value = vals.join(' ');
-      } else if(value is InlineExpression) {
-        value = _getValue(eval, value);
+        // special case for ID
+        // ids get joined via '_', not space
+        // ids are also NOT sorted.
+        if(key == 'id') {
+          value = vals.join('_');
+        } else {
+          vals.sort();
+          value = vals.join(' ');
+        }
       }
+
+      value = _getValue(eval, value);
 
       if(value is bool) {
         if(value == false) {
@@ -178,10 +185,6 @@ class ElementEntry implements HtmlEntry {
         }
       }
 
-      if(value is num) {
-        value = value.toString();
-      }
-
       assert(value is String);
 
       buffer.write(" $key='$value'");
@@ -191,10 +194,18 @@ class ElementEntry implements HtmlEntry {
   }
 
   static dynamic _getValue(ExpressionEvaluator eval, dynamic input) {
-    if(input is String) {
+    if(input is InlineExpression) {
+      input = eval(input);
+      assert(input is! InlineExpression);
+    }
+
+    if(input is num) {
+      return input.toString();
+    } else if(input is String) {
       return input;
-    } else if(input is InlineExpression) {
-      return eval(input);
+    } else if(input is bool) {
+      // just let it pass through
+      return input;
     } else {
       throw 'not supported!';
     }

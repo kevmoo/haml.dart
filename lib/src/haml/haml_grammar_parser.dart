@@ -308,11 +308,14 @@ class HamlEntityParser extends HamlEntityGrammar {
       final String value = content[1];
       switch(tag) {
         case '#':
-          values['id'] = value;
+          final idList = values.putIfAbsent('id', () => new List());
+          // for ids, last one wins, so clear it out
+          idList.clear();
+          idList.add(value);
           break;
         case '.':
-          final classArray = values.putIfAbsent('class', () => []);
-          classArray.add(value);
+          final classList = values.putIfAbsent('class', () => new List());
+          classList.add(value);
           break;
         default:
           throw 'provided prefix value "$tag" is not supported';
