@@ -6,19 +6,6 @@ class _HamlEnum {
   String toString() => '* $value *';
 }
 
-class _SpecialInstruction extends _HamlEnum {
-  static const _SpecialInstruction SELF_CLOSING =
-      const _SpecialInstruction('self-closing');
-
-  static const _SpecialInstruction REMOVE_WHITESPACE_SURROUNDING =
-      const _SpecialInstruction('remove-whitespace-surrounding');
-
-  static const _SpecialInstruction REMOVE_WHITESPACE_WITHIN =
-      const _SpecialInstruction('remove-whitespace-within');
-
-  const _SpecialInstruction(String value) : super(value);
-}
-
 typedef String ExpressionEvaluator(InlineExpression exp);
 
 class InlineExpression {
