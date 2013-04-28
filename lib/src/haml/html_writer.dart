@@ -1,6 +1,17 @@
 part of haml;
 
-Walker<Entry, String> htmlEntryToHtml({HamlFormat format: HamlFormat.HTML5}) {
+Walker<Entry, String> htmlEntryToHtml(
+    {
+      HamlFormat format: HamlFormat.HTML5,
+      ExpressionEvaluator eval: null
+      }) {
+
+  if(eval == null) {
+    eval = (InlineExpression epr) {
+      throw 'No expression evaluator provided.';
+    };
+  }
+
   final _log = (val) => util.log(val, AnsiColor.GREEN);
 
   final indentChar = ' ';
@@ -30,7 +41,7 @@ Walker<Entry, String> htmlEntryToHtml({HamlFormat format: HamlFormat.HTML5}) {
         sink.add(indentChar);
       }
 
-      HtmlEntry.writeEntry(format, sink, current, next);
+      HtmlEntry.writeEntry(format, sink, current, next, eval);
     }
   }
 

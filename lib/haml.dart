@@ -3,6 +3,7 @@ library haml;
 import 'dart:async';
 
 import 'package:meta/meta.dart';
+import 'package:bot/bot.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/xml.dart' as xmlp;
 import 'package:okoboji/core.dart';

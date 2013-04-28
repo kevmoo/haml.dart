@@ -63,7 +63,9 @@ void _testStream(_SpecData data) {
 
   final List<Entry> result = stringToHamlEntry().single(data.haml).toList();
 
-  final List<String> lines = htmlEntryToHtml(format: data.format)
+  final evaler = InlineExpression.getEvaluatorFromMap(data.locals);
+
+  final List<String> lines = htmlEntryToHtml(format: data.format, eval: evaler)
       .map(result).toList();
 
   final value = lines.join();

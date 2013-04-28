@@ -19,14 +19,30 @@ class _SpecialInstruction extends _HamlEnum {
   const _SpecialInstruction(String value) : super(value);
 }
 
-class VariableReference {
+typedef String ExpressionEvaluator(InlineExpression exp);
+
+class InlineExpression {
   final String value;
 
-  VariableReference(this.value) {
+  InlineExpression(this.value) {
     assert(HamlEntityGrammar.hamlElementNameParser.accept(value));
   }
 
   String toString() => 'VariableReference: $value';
+
+  static ExpressionEvaluator getEvaluatorFromMap(Map<String, String> map) {
+    requireArgumentNotNull(map, 'map');
+
+    return (InlineExpression val) {
+      final String result = map[val.value];
+
+      if(result == null) {
+        throw 'Could not evaluate expression "${val.value}"';
+      }
+
+      return result;
+    };
+  }
 }
 
 class HamlEntityGrammar extends CompositeParser {
@@ -157,7 +173,6 @@ class HamlEntityParser extends HamlEntityGrammar {
           var existingValue = idAndClassValues[attrName];
           if(existingValue is List) {
             existingValue.add(attrValue);
-            existingValue.sort();
           } else {
             idAndClassValues[attrName] = attrValue;
           }
@@ -209,7 +224,7 @@ class HamlEntityParser extends HamlEntityGrammar {
     });
 
     action('unquoted-value', (String value) {
-      return new VariableReference(value);
+      return new InlineExpression(value);
     });
   }
 

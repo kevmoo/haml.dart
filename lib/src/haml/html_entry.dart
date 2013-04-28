@@ -3,17 +3,19 @@ part of haml;
 
 abstract class HtmlEntry implements EntryValue {
 
-  void write(HamlFormat format, EventSink<String> sink, Entry next);
+  void write(HamlFormat format, EventSink<String> sink, Entry next,
+             ExpressionEvaluator eval);
 
   void close(HamlFormat format, EventSink<String> sink, Entry next) {
     throw 'not supported';
   }
 
   static void writeEntry(HamlFormat format, EventSink<String> sink,
-                         Entry current, Entry next) {
+                         Entry current, Entry next,
+                         ExpressionEvaluator eval) {
     if(current is HtmlEntry) {
       // NOTE: this should be fine. Editor type analysis fail
-      current.write(format, sink, next);
+      current.write(format, sink, next, eval);
     } else {
       throw 'not sure what to do here...';
     }
@@ -37,7 +39,8 @@ class StringEntry implements HtmlEntry {
   }
 
   @override
-  void write(HamlFormat format, EventSink<String> sink, Entry next) {
+  void write(HamlFormat format, EventSink<String> sink, Entry next,
+             ExpressionEvaluator eval) {
     if(next is EntryIndent) {
       throw 'not supported';
     }
@@ -59,12 +62,13 @@ class ElementEntryWithSimpleContent extends ElementEntry {
                                 this.content) : super(name, attributes);
 
   @override
-  void write(HamlFormat format, EventSink<String> sink, Entry next) {
+  void write(HamlFormat format, EventSink<String> sink, Entry next,
+             ExpressionEvaluator eval) {
     if(next is EntryIndent) {
       throw 'not supported';
     }
 
-    sink.add("<${name}${_getAttributeString()}>$content</${name}>");
+    sink.add("<${name}${_getAttributeString(eval)}>$content</${name}>");
     if(next != null) {
       sink.add('\n');
     }
@@ -96,8 +100,9 @@ class ElementEntry implements HtmlEntry {
   String toString() => '<$name>';
 
   @override
-  void write(HamlFormat format, EventSink<String> sink, Entry next) {
-    sink.add("<${name}${_getAttributeString()}");
+  void write(HamlFormat format, EventSink<String> sink, Entry next,
+             ExpressionEvaluator eval) {
+    sink.add("<${name}${_getAttributeString(eval)}");
     if(next is EntryIndent) {
       // close out the tag with a newline
       sink.add(">\n");
@@ -137,7 +142,7 @@ class ElementEntry implements HtmlEntry {
     }
   }
 
-  String _getAttributeString() {
+  String _getAttributeString(ExpressionEvaluator eval) {
     final buffer = new StringBuffer();
     // first, must be ordered
     final sortedKeys = _attributes.keys
@@ -147,7 +152,14 @@ class ElementEntry implements HtmlEntry {
       var value = _attributes[key];
       if(value is List) {
         assert(!value.isEmpty);
-        value = value.join(' ');
+
+        final List<String> vals = value.map((v) => _getValue(eval, v))
+            .toList()
+            ..sort();
+
+        value = vals.join(' ');
+      } else if(value is InlineExpression) {
+        value = _getValue(eval, value);
       }
       assert(value is String);
 
@@ -155,6 +167,16 @@ class ElementEntry implements HtmlEntry {
     });
 
     return buffer.toString();
+  }
+
+  static String _getValue(ExpressionEvaluator eval, dynamic input) {
+    if(input is String) {
+      return input;
+    } else if(input is InlineExpression) {
+      return eval(input);
+    } else {
+      throw 'not supported!';
+    }
   }
 
   static bool _isSelfClosingTag(String tag) {
@@ -190,7 +212,8 @@ class DocTypeEntry implements HtmlEntry {
   }
 
   @override
-  void write(HamlFormat format, EventSink<String> sink, Entry next) {
+  void write(HamlFormat format, EventSink<String> sink, Entry next,
+             ExpressionEvaluator eval) {
     assert(next is! EntryIndent);
     sink.add(formatLabel(format));
 
