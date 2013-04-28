@@ -15,8 +15,6 @@ part 'src/haml/haml_format.dart';
 part 'src/haml/haml_entity_parser_grammar.dart';
 part 'src/haml/html_entry.dart';
 part 'src/haml/html_writer.dart';
-part 'src/haml/nodes.dart';
-part 'src/haml/parser.dart';
 
 /*
  * TODO: this is coming back...with new hotness
