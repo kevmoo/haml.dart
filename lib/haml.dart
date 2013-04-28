@@ -8,6 +8,8 @@ import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/xml.dart' as xmlp;
 import 'package:okoboji/core.dart';
 
+import 'package:okoboji/dart_grammar.dart' as dart_grammar;
+
 import 'package:bot_io/bot_io.dart';
 import 'package:okoboji/util.dart' as util;
 

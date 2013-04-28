@@ -178,6 +178,10 @@ class ElementEntry implements HtmlEntry {
         }
       }
 
+      if(value is num) {
+        value = value.toString();
+      }
+
       assert(value is String);
 
       buffer.write(" $key='$value'");
@@ -197,7 +201,7 @@ class ElementEntry implements HtmlEntry {
   }
 
   static bool _isSelfClosingTag(String tag) {
-    const _selfClosing = const ['meta', 'input'];
+    const _selfClosing = const ['meta', 'input', 'img'];
     return _selfClosing.contains(tag);
   }
 

@@ -6,13 +6,19 @@ class InlineExpression {
   final String value;
 
   InlineExpression(this.value) {
-    assert(HamlEntityGrammar.hamlElementNameParser.accept(value));
+    assert(HamlEntityGrammar.unquotedValue.accept(value));
   }
 
   String toString() => 'VariableReference: $value';
 
   static ExpressionEvaluator getEvaluatorFromMap(Map<String, String> map) {
     requireArgumentNotNull(map, 'map');
+
+    map.keys.forEach((String k) {
+      if(!dart_grammar.dartIdentifier.accept(k)) {
+        throw new ArgumentError('Provided key "$k" is not a valid identifier');
+      }
+    });
 
     final reservedIntersect = map.keys.toSet().intersection(_reservedValues);
     if(!reservedIntersect.isEmpty) {
@@ -30,11 +36,19 @@ class InlineExpression {
 
       final String result = map[val.value];
 
-      if(result == null) {
-        throw 'Could not evaluate expression "${val.value}"';
+      if(result != null) {
+        return result;
       }
 
-      return result;
+      if(dart_grammar.dartNumber.accept(val.value)) {
+        try {
+          return int.parse(val.value);
+        } on FormatException catch (e) {
+          return double.parse(val.value);
+        }
+      }
+
+      throw 'Could not evaluate expression "${val.value}"';
     };
   }
 
@@ -42,6 +56,24 @@ class InlineExpression {
 }
 
 class HamlEntityGrammar extends CompositeParser {
+  static final _instance = new HamlEntityGrammar._internal();
+
+  static HamlEntityGrammar get instance {
+    var val = _instance;
+    if(val == null) {
+      // silly way to make sure every call throws an exception, even though
+      // subsequent calls to the static var will return null after the first
+      // call fails
+      val = new HamlEntityGrammar._internal();
+    }
+    return val;
+  }
+
+  static Parser get unquotedValue => instance['unquoted-value'];
+
+  HamlEntityGrammar._internal() : super();
+
+  factory HamlEntityGrammar() => instance;
 
   static final Parser hamlElementNameParser =
       pattern(xmlp.XmlGrammar.NAME_START_CHARS)
@@ -87,8 +119,8 @@ class HamlEntityGrammar extends CompositeParser {
         .seq(char('"').neg().star().flatten())
         .seq(char('"')));
 
-    // TODO: a good start, but probably not right
-    def('unquoted-value', ref('nameToken'));
+    // TODO: should we call this 'expression'?
+    def('unquoted-value', dart_grammar.dartIdentifier | dart_grammar.dartNumber);
 
     def('attributes', ref('html-attributes').or(ref('ruby-attributes')));
 
@@ -180,6 +212,8 @@ class HamlEntityGrammar extends CompositeParser {
 }
 
 class HamlEntityParser extends HamlEntityGrammar {
+
+  HamlEntityParser() : super._internal();
 
   @override
   void initialize() {
