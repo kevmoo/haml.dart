@@ -14,7 +14,7 @@ import 'package:bot_io/bot_io.dart';
 import 'package:okoboji/util.dart' as util;
 
 part 'src/haml/haml_format.dart';
-part 'src/haml/haml_entity_parser_grammar.dart';
+part 'src/haml/haml_grammar_parser.dart';
 part 'src/haml/html_entry.dart';
 part 'src/haml/html_writer.dart';
 
