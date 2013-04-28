@@ -1,6 +1,6 @@
 part of haml;
 
-typedef String ExpressionEvaluator(InlineExpression exp);
+typedef dynamic ExpressionEvaluator(InlineExpression exp);
 
 class InlineExpression {
   final String value;
@@ -14,7 +14,21 @@ class InlineExpression {
   static ExpressionEvaluator getEvaluatorFromMap(Map<String, String> map) {
     requireArgumentNotNull(map, 'map');
 
+    final reservedIntersect = map.keys.toSet().intersection(_reservedValues);
+    if(!reservedIntersect.isEmpty) {
+      throw new ArgumentError('map contains reserved values: ' +
+          reservedIntersect.join(', '));
+    }
+
     return (InlineExpression val) {
+      switch(val.value) {
+        case 'true':
+          return true;
+        case 'false':
+          // TODO: not sure how to handle false values...yet...hmm...
+          throw 'not sure how to evaluate false here...';
+      }
+
       final String result = map[val.value];
 
       if(result == null) {
@@ -24,6 +38,8 @@ class InlineExpression {
       return result;
     };
   }
+
+  static final _reservedValues = ['true', 'false'].toSet();
 }
 
 class HamlEntityGrammar extends CompositeParser {

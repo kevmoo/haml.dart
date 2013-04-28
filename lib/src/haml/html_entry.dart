@@ -68,7 +68,7 @@ class ElementEntryWithSimpleContent extends ElementEntry {
       throw 'not supported';
     }
 
-    sink.add("<${name}${_getAttributeString(eval)}>$content</${name}>");
+    sink.add("<${name}${_getAttributeString(format, eval)}>$content</${name}>");
     if(next != null) {
       sink.add('\n');
     }
@@ -102,7 +102,7 @@ class ElementEntry implements HtmlEntry {
   @override
   void write(HamlFormat format, EventSink<String> sink, Entry next,
              ExpressionEvaluator eval) {
-    sink.add("<${name}${_getAttributeString(eval)}");
+    sink.add("<${name}${_getAttributeString(format, eval)}");
     if(next is EntryIndent) {
       // close out the tag with a newline
       sink.add(">\n");
@@ -142,7 +142,7 @@ class ElementEntry implements HtmlEntry {
     }
   }
 
-  String _getAttributeString(ExpressionEvaluator eval) {
+  String _getAttributeString(HamlFormat format, ExpressionEvaluator eval) {
     final buffer = new StringBuffer();
     // first, must be ordered
     final sortedKeys = _attributes.keys
@@ -161,6 +161,20 @@ class ElementEntry implements HtmlEntry {
       } else if(value is InlineExpression) {
         value = _getValue(eval, value);
       }
+
+      if(value is bool) {
+        // TODO: not sure how to handle false values...yet...hmm...
+        assert(value == true);
+        if(format == HamlFormat.XHTML) {
+          // just print out the key as the value
+          value = key;
+        } else {
+          // else, just write the attribute name alone and call it good
+          buffer.write(" $key");
+          return;
+        }
+      }
+
       assert(value is String);
 
       buffer.write(" $key='$value'");
@@ -169,7 +183,7 @@ class ElementEntry implements HtmlEntry {
     return buffer.toString();
   }
 
-  static String _getValue(ExpressionEvaluator eval, dynamic input) {
+  static dynamic _getValue(ExpressionEvaluator eval, dynamic input) {
     if(input is String) {
       return input;
     } else if(input is InlineExpression) {
@@ -180,7 +194,7 @@ class ElementEntry implements HtmlEntry {
   }
 
   static bool _isSelfClosingTag(String tag) {
-    const _selfClosing = const ['meta'];
+    const _selfClosing = const ['meta', 'input'];
     return _selfClosing.contains(tag);
   }
 
