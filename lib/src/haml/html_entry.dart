@@ -60,7 +60,8 @@ class StringEntry implements HtmlEntry {
   void write(HamlFormat format, EventSink<String> sink, Entry next,
              ExpressionEvaluator eval) {
     if(next is EntryIndent) {
-      throw 'not supported';
+      throw new HamlError('Cannot add nested content under a StringEntry: '
+          '"$value"');
     }
 
     sink.add(value);
