@@ -30,6 +30,25 @@ abstract class HtmlEntry implements EntryValue {
   }
 }
 
+class OneLineMarkupComment implements HtmlEntry {
+  final String value;
+
+  OneLineMarkupComment(this.value);
+
+  @override
+  void write(HamlFormat format, EventSink<String> sink, Entry next,
+             ExpressionEvaluator eval) {
+    if(next is EntryIndent) {
+      throw 'not supported';
+    }
+
+    sink.add('<!-- $value -->');
+    if(next != null) {
+      sink.add('\n');
+    }
+  }
+}
+
 class StringEntry implements HtmlEntry {
   final String value;
 

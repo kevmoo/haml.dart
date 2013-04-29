@@ -38,12 +38,22 @@ class HamlEntityGrammar extends CompositeParser {
   void initialize() {
     def('start', ref('entity').end());
 
-    def('entity', ref('doctype').or(ref('element')).or(ref('text')));
+    def('entity', ref('doctype') | ref('element') | ref('markup-comment') |
+        ref('text'));
 
-    def('element', ref('named-element').or(ref('implicit-div-element'))
+    def('element', ref('named-element')
+        .or(ref('implicit-div-element'))
         .seq(ref('attributes').optional())
         .seq(ref('special-instructions').optional())
         .seq(ref('content').optional()));
+
+    def('markup-comment', ref('markup-comment-one-line'));
+
+    def('markup-comment-one-line',
+        char('/')
+        .seq(ref('spaces'))
+        .seq(any().plus().flatten())
+        .pick(2));
 
     //
     // Attribute parsing shared
@@ -165,6 +175,7 @@ class HamlEntityParser extends HamlEntityGrammar {
     super.initialize();
 
     action('doctype', (value) => new DocTypeEntry(value));
+
     action('element', (List value) {
       assert(value.length == 4);
 
@@ -239,6 +250,10 @@ class HamlEntityParser extends HamlEntityGrammar {
 
     action('unquoted-value', (String value) {
       return new InlineExpression(value);
+    });
+
+    action('markup-comment-one-line', (String value) {
+      return new OneLineMarkupComment(value);
     });
   }
 
