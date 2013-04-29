@@ -10,9 +10,6 @@ import 'package:okoboji/core.dart';
 
 import 'package:okoboji/dart_grammar.dart' as dart_grammar;
 
-import 'package:bot_io/bot_io.dart';
-import 'package:okoboji/util.dart' as util;
-
 part 'src/haml/haml_format.dart';
 part 'src/haml/haml_grammar_parser.dart';
 part 'src/haml/html_entry.dart';
