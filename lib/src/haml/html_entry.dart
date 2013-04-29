@@ -1,6 +1,5 @@
 part of haml;
 
-
 abstract class HtmlEntry implements EntryValue {
 
   void write(HamlFormat format, EventSink<String> sink, Entry next,
