@@ -14,30 +14,42 @@ void main() {
   button.onClick.listen(_convertClick);
 
   _cmOutput = html.query('.CodeMirror.outputCM');
+
+  _setOutputValue('loaded', { 'mode': 'text', 'lineNumbers': false });
 }
 
 void _convertClick(args) {
 
   var sourceVal = _getSourceValue();
 
-  _setOutputValue('working...\n\n' + sourceVal, {'mode': 'text'});
+  var options = {
+                 'lineNumbers': false,
+                 'mode': 'text'
+  };
+
+  _setOutputValue('working...', options);
 
   runAsync(() {
     String content = '';
-    String mode = 'htmlmixed';
-    bool lineNumbers = true;
+
     try {
       content = _test(sourceVal);
       _cmOutput.classes.remove('error');
+
+      options = { 'mode': 'htmlmixed',
+                  'lineNumbers': true
+                  };
+
     } catch (e, stack) {
       _cmOutput.classes.add('error');
-      mode = 'text';
-      lineNumbers = false;
+
+      options = { 'mode': 'text',
+                  'lineNumbers': false};
 
       content = e.toString() + '\n' + stack.toString();
     }
 
-    _setOutputValue(content, {'lineNumbers': lineNumbers, 'mode': mode});
+    _setOutputValue(content, options);
   });
 }
 
