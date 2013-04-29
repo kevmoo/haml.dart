@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>index</title>
+    <link rel="stylesheet" type='text/css' href='//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/codemirror.css'>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/codemirror.js'></script>
+  </head>
+
+  <body>
+    <p id="text"></p>
+
+    <textarea id='source'></textarea>
+
+    <p>
+      <button id='convert'>click to convert</button>
+    </p>
+
+    <textarea id='output-html'></textarea>
+
+    <script type="application/dart" src="index.dart"></script>
+
+    <script src="packages/browser/dart.js"></script>
+    <script src="packages/js/dart_interop.js"></script>
+
+    <script type='application/javascript'>
+      var myTextArea = document.getElementById('source');
+      window._sourceCodeMirror = CodeMirror(function(elt) {
+        myTextArea.parentNode.replaceChild(elt, myTextArea);
+      }, {
+        value: '%h1 Header!\n%p paragraph\n',
+        lineNumbers: true,
+        indentWithTabs: false,
+        tabSize: 2
+      });
+
+      var outputTextArea = document.getElementById('output-html');
+      window._outputCodeMirror = CodeMirror(function(elt) {
+        outputTextArea.parentNode.replaceChild(elt, outputTextArea);
+      }, {
+        lineNumbers: true,
+        indentWithTabs: false,
+        tabSize: 2
+      });
+    </script>
+  </body>
+</html>
