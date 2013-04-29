@@ -1,4 +1,7 @@
 name: okoboji
+author: Kevin Moore <kevin@thinkpixellab.com>
+environment:
+  sdk: '>=0.4.7+1'
 dependencies:
   bot: '>=0.16.3+1'
   bot_io: '>=0.20.0-dev'
@@ -7,4 +10,5 @@ dependencies:
   pathos: '>=0.4.5+1'
   meta: '>=0.4.5+1'
 dev_dependencies:
+  browser: '>=0.5.0+1'
   hop: '>=0.20.0'
