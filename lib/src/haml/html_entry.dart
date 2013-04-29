@@ -23,6 +23,7 @@ abstract class HtmlEntry implements EntryValue {
   static void closeEntry(HamlFormat format, EventSink<String> sink,
                          Entry current, Entry next) {
     if(current is HtmlEntry) {
+      // NOTE: this should be fine. Editor type analysis fail
       current.close(format, sink, next);
     } else {
       throw 'not supported?';
