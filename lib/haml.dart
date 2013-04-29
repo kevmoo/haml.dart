@@ -7,9 +7,9 @@ import 'package:logging/logging.dart' as logging;
 import 'package:bot/bot.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/xml.dart' as xmlp;
-import 'package:okoboji/core.dart';
+import 'package:haml/core.dart';
 
-import 'package:okoboji/dart_grammar.dart' as dart_grammar;
+import 'package:haml/dart_grammar.dart' as dart_grammar;
 
 part 'src/haml/haml_format.dart';
 part 'src/haml/haml_grammar_parser.dart';

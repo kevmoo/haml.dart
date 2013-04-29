@@ -3,8 +3,8 @@ import 'dart:html' as html;
 
 import 'package:js/js.dart' as js;
 
-import 'package:okoboji/core.dart';
-import 'package:okoboji/haml.dart';
+import 'package:haml/core.dart';
+import 'package:haml/haml.dart';
 
 html.DivElement _cmOutput;
 

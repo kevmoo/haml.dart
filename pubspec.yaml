@@ -1,5 +1,6 @@
-name: okoboji
+name: haml
 author: Kevin Moore <kevin@thinkpixellab.com>
+homepage: https://github.com/kevmoo/haml.dart
 environment:
   sdk: '>=0.4.7+1'
 dependencies:

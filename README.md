@@ -1,4 +1,4 @@
-# Okoboji (working name, a lake I grew up close to)
+# Haml.dart
 
  * Main goal: a [haml-spec](https://github.com/haml/haml-spec) compliant implementation of [Haml](http://haml.info/) in Dart.
  * A bunch of helpers to parse indention-based grammars to make things like `Haml` (and hopefully `Sass`) easier.

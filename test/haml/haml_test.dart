@@ -1,8 +1,8 @@
 library test.haml;
 
 import 'package:unittest/unittest.dart';
-import 'package:okoboji/core.dart';
-import 'package:okoboji/haml.dart';
+import 'package:haml/core.dart';
+import 'package:haml/haml.dart';
 import '../test_shared.dart';
 
 

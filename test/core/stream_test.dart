@@ -7,7 +7,7 @@ import 'dart:math' as math;
 import 'package:bot/bot.dart';
 import 'package:unittest/unittest.dart';
 
-import 'package:okoboji/core.dart';
+import 'package:haml/core.dart';
 
 final _rnd = new math.Random();
 

@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'package:petitparser/petitparser.dart';
 import 'package:unittest/unittest.dart';
 
-import 'package:okoboji/core.dart';
+import 'package:haml/core.dart';
 
 import '../test_shared.dart';
 
