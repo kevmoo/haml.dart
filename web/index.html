@@ -11,6 +11,10 @@
       }
     </style>
     <script src='//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/codemirror.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/xml.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/javascript.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/css.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/htmlmixed.js'></script>
   </head>
 
   <body>
@@ -38,8 +42,13 @@
         value: '%h1 Header!\n%p paragraph\n',
         lineNumbers: true,
         indentWithTabs: false,
-        tabSize: 2
+        tabSize: 2,
+        tabMode: "indent"
       });
+
+      var mixedMode = {
+        name: "htmlmixed"
+      };
 
       var outputTextArea = document.getElementById('output-html');
       window._outputCodeMirror = CodeMirror(function(elt) {
@@ -48,8 +57,11 @@
         lineNumbers: true,
         indentWithTabs: false,
         tabSize: 2,
-        readOnly: true
+        readOnly: true,
+        mode: mixedMode
       });
+
+
     </script>
   </body>
 </html>
