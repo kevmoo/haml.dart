@@ -52,3 +52,14 @@ final _entryParser = new HamlEntityParser();
 logging.Logger _getLogger(String name) {
   return new logging.Logger(name);
 }
+
+class HamlError implements Error {
+  final String message;
+
+  HamlError(this.message) {
+    requireArgumentNotNullOrEmpty(message, 'message');
+  }
+
+  @override
+  String toString() => 'HamlError: $message';
+}

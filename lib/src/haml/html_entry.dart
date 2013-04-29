@@ -83,7 +83,7 @@ class ElementEntryWithSimpleContent extends ElementEntry {
   void write(HamlFormat format, EventSink<String> sink, Entry next,
              ExpressionEvaluator eval) {
     if(next is EntryIndent) {
-      throw 'not supported';
+      throw new HamlError('The parent element "$name" already has content.');
     }
 
     sink.add("<${name}${_getAttributeString(format, eval)}>$content</${name}>");
