@@ -17,6 +17,7 @@ part 'src/haml/haml_format.dart';
 part 'src/haml/haml_grammar_parser.dart';
 part 'src/haml/html_entry.dart';
 part 'src/haml/html_writer.dart';
+part 'src/haml/inline_expression.dart';
 
 /*
  * TODO: this is coming back...with new hotness
