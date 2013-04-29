@@ -45,7 +45,7 @@ class HamlEntityGrammar extends CompositeParser {
         .or(ref('implicit-div-element'))
         .seq(ref('attributes').optional())
         .seq(ref('special-instructions').optional())
-        .seq(ref('content').optional()));
+        .seq((ref('content') | whitespace()).optional()));
 
     def('markup-comment', ref('markup-comment-one-line'));
 
@@ -214,7 +214,7 @@ class HamlEntityParser extends HamlEntityGrammar {
 
       final content = value[3];
 
-      if(content == null) {
+      if(content == null || content.trim().isEmpty) {
         return new ElementEntry(name, idAndClassValues, selfClosing: selfClosing);
       } else {
         assert(selfClosing == null);
