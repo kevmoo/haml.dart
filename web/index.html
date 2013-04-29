@@ -2,21 +2,28 @@
 
 <html>
   <head>
-    <title>index</title>
+    <title>HAML test</title>
     <link rel="stylesheet" type='text/css' href='//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/codemirror.css'>
+    <style type='text/css'>
+      .CodeMirror {
+        float: left;
+        width: 50%;
+      }
+    </style>
     <script src='//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/codemirror.js'></script>
   </head>
 
   <body>
     <p id="text"></p>
 
-    <textarea id='source'></textarea>
-
     <p>
       <button id='convert'>click to convert</button>
     </p>
 
+    <textarea id='source'></textarea>
+
     <textarea id='output-html'></textarea>
+
 
     <script type="application/dart" src="index.dart"></script>
 
@@ -40,7 +47,8 @@
       }, {
         lineNumbers: true,
         indentWithTabs: false,
-        tabSize: 2
+        tabSize: 2,
+        readOnly: true
       });
     </script>
   </body>
