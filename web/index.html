@@ -14,6 +14,10 @@
       .cm-tab {
          background-color: red;
       }
+
+      .CodeMirror.error {
+        background-color: #fcc;
+      }
     </style>
     <script src='//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/codemirror.js'></script>
     <script src='//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/xml.js'></script>
@@ -43,6 +47,7 @@
       var myTextArea = document.getElementById('source');
       window._sourceCodeMirror = CodeMirror(function(elt) {
         myTextArea.parentNode.replaceChild(elt, myTextArea);
+        elt.className += ' sourceCM';
       }, {
         value: '%h1 Header!\n%p paragraph\n',
         lineNumbers: true,
@@ -51,19 +56,16 @@
         tabMode: "indent"
       });
 
-      var mixedMode = {
-        name: "htmlmixed"
-      };
-
       var outputTextArea = document.getElementById('output-html');
       window._outputCodeMirror = CodeMirror(function(elt) {
         outputTextArea.parentNode.replaceChild(elt, outputTextArea);
+        elt.className += ' outputCM';
       }, {
         lineNumbers: true,
         indentWithTabs: false,
         tabSize: 2,
         readOnly: true,
-        mode: mixedMode
+        mode: "htmlmixed"
       });
 
 
