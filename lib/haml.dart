@@ -3,6 +3,7 @@ library haml;
 import 'dart:async';
 
 import 'package:meta/meta.dart';
+import 'package:logging/logging.dart' as logging;
 import 'package:bot/bot.dart';
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/xml.dart' as xmlp;
@@ -47,3 +48,7 @@ HtmlEntry _getHamlEntry(String value) {
 }
 
 final _entryParser = new HamlEntityParser();
+
+logging.Logger _getLogger(String name) {
+  return new logging.Logger(name);
+}

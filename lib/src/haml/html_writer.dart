@@ -12,7 +12,7 @@ Walker<Entry, String> htmlEntryToHtml(
     };
   }
 
-  final _log = (val) => print(val);
+  void _log (val) => _getLogger('htmlEntryToHtml').log(logging.Level.INFO, val.toString());
 
   final indentChar = ' ';
   final indentCount = 2;
