@@ -11,25 +11,18 @@ void main() {
   html.ButtonElement button = html.query('#convert');
 
   button.onClick.listen(_convertClick);
-
 }
 
 void _convertClick(args) {
-  print('click!');
 
   var sourceVal = _getSourceValue();
-  print('value: $sourceVal');
 
   _setOutputValue('working...\n\n' + sourceVal);
 
   runAsync(() {
     var parsedOutput = _test(sourceVal);
     _setOutputValue(parsedOutput);
-
   });
-
-
-
 }
 
 String _getSourceValue() {
@@ -39,8 +32,6 @@ String _getSourceValue() {
 void _setOutputValue(String value) {
   js.context['window']['_outputCodeMirror']['setValue'](value);
 }
-
-
 
 String _test(String input) {
   final List<Entry> result = stringToHamlEntry().single(input).toList();
