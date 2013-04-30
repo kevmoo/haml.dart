@@ -4,13 +4,13 @@ homepage: https://github.com/kevmoo/haml.dart
 environment:
   sdk: '>=0.4.7+1'
 dependencies:
-  bot: '>=0.16.3+1'
-  bot_io: '>=0.20.0-dev'
+  bot: '>=0.20.1'
   js: '>=0.0.22'
+  petitparser: '>=0.4.0'
   logging: '>=0.4.5+1'
-  meta: '>=0.4.5+1'
+  bot_io: '>=0.21.0+2'
   pathos: '>=0.4.5+1'
-  petitparser: '>=0.2.5+m4'
+  meta: '>=0.4.5+1'
 dev_dependencies:
   browser: '>=0.5.0+1'
-  hop: '>=0.20.0'
+  hop: '>=0.22.0'
