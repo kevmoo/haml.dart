@@ -126,7 +126,7 @@ class ElementEntry implements HtmlEntry {
     if(next is EntryIndent) {
       // close out the tag with a newline
       sink.add(">\n");
-    } else if(next == null || next is EntryUndent) {
+    } else {
       // close out the tag as a solo tag -- format dependant
 
       if(!selfClosing) {
@@ -149,8 +149,6 @@ class ElementEntry implements HtmlEntry {
       if(next != null) {
         sink.add('\n');
       }
-    } else {
-      throw 'dude...uh..next... $next';
     }
   }
 
