@@ -33,7 +33,7 @@ void _convertClick(args) {
     String content = '';
 
     try {
-      content = _test(sourceVal);
+      content = hamlStringToHtml(sourceVal);
       _cmOutput.classes.remove('error');
 
       options = { 'mode': 'htmlmixed',
@@ -63,13 +63,4 @@ void _setOutputValue(String value, Map options) {
   options.forEach((k, v) {
     js.context['window']['_outputCodeMirror']['setOption'](k, v);
   });
-}
-
-String _test(String input) {
-  final List<Entry> result = stringToHamlEntry().single(input).toList();
-
-  final List<String> lines = htmlEntryToHtml()
-      .map(result).toList();
-
-  return lines.join();
 }

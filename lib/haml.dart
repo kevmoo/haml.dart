@@ -17,22 +17,26 @@ part 'src/haml/html_entry.dart';
 part 'src/haml/html_writer.dart';
 part 'src/haml/inline_expression.dart';
 
-/*
- * TODO: this is coming back...with new hotness
-String parse(String sourceHaml, {HamlFormat format: HamlFormat.HTML5}) {
-  final parser = new HamlParser(format: format);
-  var result = parser.parse(sourceHaml).result;
-  // print(result);
-  return result.doFormat();
+String hamlStringToHtml(String hamlString,
+                        { HamlFormat format: HamlFormat.HTML5,
+                          ExpressionEvaluator eval: null}) {
+  return _hamlStringToHtmlLines(format: format, eval: eval)
+      .single(hamlString)
+      .join();
 }
-*/
 
-// TODO: rename this to stringToHtmlEntry, right?
-Walker<String, Entry> stringToHamlEntry() {
+
+Walker<String, Entry> hamlStringToHtmlEntry() {
   return stringToLines()
       .chain(linesToIndents())
       .chain(indentsToTokens())
       .chain(tokensToEntries(_getHamlEntry));
+}
+
+Walker<String, String> _hamlStringToHtmlLines(
+    { HamlFormat format: HamlFormat.HTML5, ExpressionEvaluator eval: null}) {
+  return hamlStringToHtmlEntry()
+      .chain(htmlEntryToHtml(format: format, eval: eval));
 }
 
 HtmlEntry _getHamlEntry(String value) {

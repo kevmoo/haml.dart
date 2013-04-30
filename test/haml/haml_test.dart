@@ -42,14 +42,10 @@ void _testStream(_SpecData data) {
   print('\nhtml');
   print(data.html);
 
-  final List<Entry> result = stringToHamlEntry().single(data.haml).toList();
-
   final evaler = InlineExpression.getEvaluatorFromMap(data.locals);
 
-  final List<String> lines = htmlEntryToHtml(format: data.format, eval: evaler)
-      .map(result).toList();
+  final value = hamlStringToHtml(data.haml, format: data.format, eval: evaler);
 
-  final value = lines.join();
   print("**VALUE**");
   print(value);
 
