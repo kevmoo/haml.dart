@@ -31,6 +31,21 @@ abstract class HtmlEntry implements EntryValue {
   }
 }
 
+class SilentComment implements HtmlEntry {
+  final String value;
+
+  SilentComment(this.value);
+
+  void write(HamlFormat format, EventSink<String> sink, Entry next,
+             ExpressionEvaluator eval) {
+    // noop!
+  }
+
+  void close(HamlFormat format, EventSink<String> sink, Entry next) {
+    // noop!
+  }
+}
+
 class OneLineMarkupComment implements HtmlEntry {
   final String value;
 

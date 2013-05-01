@@ -38,7 +38,7 @@ class HamlEntityGrammar extends CompositeParser {
   void initialize() {
     def('start', ref('entity').end());
 
-    def('entity', ref('doctype') | ref('element') | ref('markup-comment') |
+    def('entity', ref('doctype') | ref('element') | ref('comment') |
         ref('text'));
 
     def('element', ref('named-element')
@@ -46,14 +46,6 @@ class HamlEntityGrammar extends CompositeParser {
         .seq(ref('attributes').optional())
         .seq(ref('special-instructions').optional())
         .seq((ref('content') | whitespace()).optional()));
-
-    def('markup-comment', ref('markup-comment-one-line'));
-
-    def('markup-comment-one-line',
-        char('/')
-        .seq(ref('spaces'))
-        .seq(any().plus().flatten())
-        .pick(2));
 
     //
     // Attribute parsing shared
@@ -129,6 +121,21 @@ class HamlEntityGrammar extends CompositeParser {
     def('ruby-hash-colon-key', char(':').seq(ref('attribute-name')).pick(1));
 
     def('ruby-hash-quoted-key', ref('quoted-value'));
+
+    //
+    // comments
+    //
+    def('comment', ref('silent-comment') | ref('markup-comment'));
+
+    def('markup-comment', ref('markup-comment-one-line'));
+
+    def('markup-comment-one-line',
+        char('/')
+        .seq(ref('spaces'))
+        .seq(any().plus().flatten())
+        .pick(2));
+
+    def('silent-comment', string('-#').seq(any().star()).flatten());
 
     //
     // and other things...
@@ -254,6 +261,10 @@ class HamlEntityParser extends HamlEntityGrammar {
 
     action('markup-comment-one-line', (String value) {
       return new OneLineMarkupComment(value);
+    });
+
+    action('silent-comment', (String value) {
+      return new SilentComment(value);
     });
   }
 
