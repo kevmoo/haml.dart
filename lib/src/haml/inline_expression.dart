@@ -26,30 +26,37 @@ class InlineExpression {
           reservedIntersect.join(', '));
     }
 
-    return (InlineExpression val) {
-      switch(val.value) {
-        case 'true':
-          return true;
-        case 'false':
-          return false;
+    final eval = (String expression) {
+      if(map.containsKey(expression)) {
+        return map[expression];
       }
-
-      final String result = map[val.value];
-
-      if(result != null) {
-        return result;
-      }
-
-      if(dart_grammar.dartNumber.accept(val.value)) {
-        try {
-          return int.parse(val.value);
-        } on FormatException catch (e) {
-          return double.parse(val.value);
-        }
-      }
-
-      throw 'Could not evaluate expression "${val.value}"';
+      throw 'could not find "$expression"';
     };
+
+    return (InlineExpression val) => evaluate(val.value, eval);
+  }
+
+  static dynamic evaluate(String expression, [dynamic lookup(String val)]) {
+    switch(expression) {
+      case 'true':
+        return true;
+      case 'false':
+        return false;
+    }
+
+    if(dart_grammar.dartNumber.accept(expression)) {
+      try {
+        return int.parse(expression);
+      } on FormatException catch (e) {
+        return double.parse(expression);
+      }
+    }
+
+    if(lookup != null) {
+      return lookup(expression);
+    }
+
+    throw 'Could not evaluate expression "${expression}"';
   }
 
   static final _reservedValues = ['true', 'false'].toSet();
