@@ -35,11 +35,14 @@ class HamlEntityGrammar extends CompositeParser {
       '-0-9\u00B7\u0300-\u036F\u203F-\u2040'
       '${xmlp.XmlGrammar.NAME_START_CHARS}';
 
+  static const String _alwaysEscapePrefix = '&';
+  static const String _neverEscapePrefx = '!';
+
   void initialize() {
     def('start', ref('entity').end());
 
     def('entity', ref('doctype') | ref('element') | ref('comment') |
-        ref('text'));
+        ref('evaluate') | ref('text'));
 
     def('element', ref('named-element')
         .or(ref('implicit-div-element'))
@@ -121,6 +124,14 @@ class HamlEntityGrammar extends CompositeParser {
     def('ruby-hash-colon-key', char(':').seq(ref('attribute-name')).pick(1));
 
     def('ruby-hash-quoted-key', ref('quoted-value'));
+
+    //
+    // evaluate
+    //
+    def('evaluate', (char(_neverEscapePrefx) | char(_alwaysEscapePrefix)).optional()
+        .seq(char('='))
+        .seq(any().plus().flatten().trim())
+        .permute([0,2]));
 
     //
     // comments
@@ -261,6 +272,28 @@ class HamlEntityParser extends HamlEntityGrammar {
 
     action('markup-comment-one-line', (String value) {
       return new OneLineMarkupComment(value);
+    });
+
+    action('evaluate', (List<String> value) {
+      assert(value.length == 2);
+
+      final escapeFlag = value[0];
+      bool escapeVal;
+
+      if(escapeFlag == null) {
+        escapeVal = null;
+      } else if(escapeFlag == _alwaysEscapePrefix) {
+        escapeVal = true;
+      } else if(escapeFlag == _neverEscapePrefx) {
+        escapeVal = false;
+      } else {
+        throw 'Invalid escape flag "$escapeFlag"';
+      }
+
+      final val = value[0];
+      assert(val != null);
+
+      throw 'evaluate is not finished...';
     });
 
     action('silent-comment', (String value) {
