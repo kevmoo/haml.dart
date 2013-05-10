@@ -3,7 +3,7 @@ part of haml;
 abstract class HtmlEntry implements EntryValue {
 
   void write(HamlFormat format, EventSink<String> sink, Entry next,
-             ExpressionEvaluator eval);
+             dart.ExpressionEvaluator eval);
 
   void close(HamlFormat format, EventSink<String> sink, Entry next) {
     throw 'not supported';
@@ -11,7 +11,7 @@ abstract class HtmlEntry implements EntryValue {
 
   static void writeEntry(HamlFormat format, EventSink<String> sink,
                          Entry current, Entry next,
-                         ExpressionEvaluator eval) {
+                         dart.ExpressionEvaluator eval) {
     if(current is HtmlEntry) {
       // NOTE: this should be fine. Editor type analysis fail
       current.write(format, sink, next, eval);
@@ -37,7 +37,7 @@ class SilentComment implements HtmlEntry {
   SilentComment(this.value);
 
   void write(HamlFormat format, EventSink<String> sink, Entry next,
-             ExpressionEvaluator eval) {
+             dart.ExpressionEvaluator eval) {
     // noop!
   }
 
@@ -53,7 +53,7 @@ class OneLineMarkupComment implements HtmlEntry {
 
   @override
   void write(HamlFormat format, EventSink<String> sink, Entry next,
-             ExpressionEvaluator eval) {
+             dart.ExpressionEvaluator eval) {
     if(next is EntryIndent) {
       throw 'not supported';
     }
@@ -74,7 +74,7 @@ class StringEntry implements HtmlEntry {
 
   @override
   void write(HamlFormat format, EventSink<String> sink, Entry next,
-             ExpressionEvaluator eval) {
+             dart.ExpressionEvaluator eval) {
     if(next is EntryIndent) {
       throw new HamlError('Cannot add nested content under a StringEntry: '
           '"$value"');
@@ -98,7 +98,7 @@ class ElementEntryWithSimpleContent extends ElementEntry {
 
   @override
   void write(HamlFormat format, EventSink<String> sink, Entry next,
-             ExpressionEvaluator eval) {
+             dart.ExpressionEvaluator eval) {
     if(next is EntryIndent) {
       throw new HamlError('The parent element "$name" already has content.');
     }
@@ -136,7 +136,7 @@ class ElementEntry implements HtmlEntry {
 
   @override
   void write(HamlFormat format, EventSink<String> sink, Entry next,
-             ExpressionEvaluator eval) {
+             dart.ExpressionEvaluator eval) {
     sink.add("<${name}${_getAttributeString(format, eval)}");
     if(next is EntryIndent) {
       // close out the tag with a newline
@@ -175,7 +175,7 @@ class ElementEntry implements HtmlEntry {
     }
   }
 
-  String _getAttributeString(HamlFormat format, ExpressionEvaluator eval) {
+  String _getAttributeString(HamlFormat format, dart.ExpressionEvaluator eval) {
     final buffer = new StringBuffer();
     // first, must be ordered
     final sortedKeys = _attributes.keys
@@ -226,10 +226,10 @@ class ElementEntry implements HtmlEntry {
     return buffer.toString();
   }
 
-  static dynamic _getValue(ExpressionEvaluator eval, dynamic input) {
-    if(input is InlineExpression) {
+  static dynamic _getValue(dart.ExpressionEvaluator eval, dynamic input) {
+    if(input is dart.InlineExpression) {
       input = eval(input);
-      assert(input is! InlineExpression);
+      assert(input is! dart.InlineExpression);
     }
 
     if(input is num) {
@@ -278,7 +278,7 @@ class DocTypeEntry implements HtmlEntry {
 
   @override
   void write(HamlFormat format, EventSink<String> sink, Entry next,
-             ExpressionEvaluator eval) {
+             dart.ExpressionEvaluator eval) {
     assert(next is! EntryIndent);
     sink.add(formatLabel(format));
 

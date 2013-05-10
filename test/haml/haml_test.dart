@@ -3,10 +3,16 @@ library test.haml;
 import 'package:unittest/unittest.dart';
 import 'package:haml/core.dart';
 import 'package:haml/haml.dart';
+import 'package:haml/dart_grammar.dart' as dart;
 import '../test_shared.dart';
 
+part 'inline_expression_tests.dart';
 
 void main() {
+
+  group('InlineExpression', () {
+    _registerInlineExpressionTests();
+  });
 
   final jsonValue = getHamlSpecTests();
 
@@ -42,7 +48,7 @@ void _testStream(_SpecData data) {
   print('\nhtml');
   print(data.html);
 
-  final evaler = InlineExpression.getEvaluatorFromMap(data.locals);
+  final evaler = dart.InlineExpression.getEvaluatorFromMap(data.locals);
 
   final value = hamlStringToHtml(data.haml, format: data.format, eval: evaler);
 

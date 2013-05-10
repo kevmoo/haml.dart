@@ -14,7 +14,7 @@ class HamlEntityGrammar extends CompositeParser {
     return val;
   }
 
-  static Parser get unquotedValue => instance['unquoted-value'];
+  static Parser get unquotedValue => instance['dart-expression'];
 
   HamlEntityGrammar._internal() : super();
 
@@ -69,10 +69,13 @@ class HamlEntityGrammar extends CompositeParser {
         .seq(char('"').neg().star().flatten())
         .seq(char('"')));
 
-    // TODO: should we call this 'expression'?
-    def('unquoted-value', dart_grammar.dartIdentifier | dart_grammar.dartNumber);
-
     def('attributes', ref('html-attributes').or(ref('ruby-attributes')));
+
+    //
+    // Dart expressions
+    //
+
+    def('dart-expression', dart.dartExpression);
 
     //
     // HTML attributes  ( a = 'b' ...)
@@ -89,7 +92,7 @@ class HamlEntityGrammar extends CompositeParser {
         .seq(ref('spaces').optional())
         .seq(char('='))
         .seq(ref('spaces').optional())
-        .seq(ref('quoted-value').or(ref('unquoted-value')))
+        .seq(ref('quoted-value').or(ref('dart-expression')))
         .permute([0, 4])
         );
 
@@ -115,7 +118,7 @@ class HamlEntityGrammar extends CompositeParser {
         .seq(ref('spaces').optional())
         .seq(string('=>'))
         .seq(ref('spaces').optional())
-        .seq(ref('quoted-value').or(ref('unquoted-value')))
+        .seq(ref('quoted-value').or(ref('dart-expression')))
         .permute([0, 4])
         );
 
@@ -264,10 +267,6 @@ class HamlEntityParser extends HamlEntityGrammar {
 
     action('text', (String value) {
       return new StringEntry(value);
-    });
-
-    action('unquoted-value', (String value) {
-      return new InlineExpression(value);
     });
 
     action('markup-comment-one-line', (String value) {

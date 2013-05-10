@@ -9,17 +9,16 @@ import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/xml.dart' as xmlp;
 import 'package:haml/core.dart';
 
-import 'package:haml/dart_grammar.dart' as dart_grammar;
+import 'package:haml/dart_grammar.dart' as dart;
 
 part 'src/haml/haml_format.dart';
 part 'src/haml/haml_grammar_parser.dart';
 part 'src/haml/html_entry.dart';
 part 'src/haml/html_writer.dart';
-part 'src/haml/inline_expression.dart';
 
 String hamlStringToHtml(String hamlString,
                         { HamlFormat format: HamlFormat.HTML5,
-                          ExpressionEvaluator eval: null}) {
+  dart.ExpressionEvaluator eval: null}) {
   return _hamlStringToHtmlLines(format: format, eval: eval)
       .single(hamlString)
       .join();
@@ -34,7 +33,7 @@ Walker<String, Entry> hamlStringToHtmlEntry() {
 }
 
 Walker<String, String> _hamlStringToHtmlLines(
-    { HamlFormat format: HamlFormat.HTML5, ExpressionEvaluator eval: null}) {
+    { HamlFormat format: HamlFormat.HTML5, dart.ExpressionEvaluator eval: null}) {
   return hamlStringToHtmlEntry()
       .chain(htmlEntryToHtml(format: format, eval: eval));
 }

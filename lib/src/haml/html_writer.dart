@@ -3,11 +3,11 @@ part of haml;
 Walker<Entry, String> htmlEntryToHtml(
     {
       HamlFormat format: HamlFormat.HTML5,
-      ExpressionEvaluator eval: null
+      dart.ExpressionEvaluator eval: null
       }) {
 
   if(eval == null) {
-    eval = (InlineExpression epr) {
+    eval = (dart.InlineExpression epr) {
       throw 'No expression evaluator provided.';
     };
   }

@@ -1,46 +1,139 @@
 library dart_grammar;
 
+import 'package:bot/bot.dart';
 import 'package:petitparser/petitparser.dart';
+import 'package:petitparser/dart.dart';
 
-final _grammarInstance = new DartGrammar();
+final _parserInstance = new DartParser();
 
-final Parser dartIdentifier = _grammarInstance['IDENTIFIER'].flatten();
-final Parser dartNumber = _grammarInstance['NUMBER'].flatten();
+final Parser dartExpression = _parserInstance['simple-expression'];
+final Parser dartIdentifier = _parserInstance['identifier'];
 
-/**
- * Only a partial grammar...just for the bits needed by HAML at the moment
- */
-class DartGrammar extends CompositeParser {
+class DartParser extends DartGrammar {
   void initialize() {
-    def('start', ref('IDENTIFIER').end());
+    super.initialize();
 
-    def('DIGIT' , range('0', '9'));
-    def('LETTER', letter());
-    def('dot', char('.'));
-    def('minus', char('-'));
-    def('pluz', char('+'));
+    def('simple-expression', ref('literal'));
 
-    def('IDENTIFIER_START_NO_DOLLAR', ref('LETTER') | char('_'));
+    redef('numericLiteral', (parser) => parser.flatten());
 
-    def('IDENTIFIER_START', ref('IDENTIFIER_START_NO_DOLLAR') | char('\$'));
+    action('singleLineString', (List value) {
+      if(value.length == 3) {
+        assert(value[0] is Token);
+        assert(value[2] is Token);
 
-    def('IDENTIFIER_PART_NO_DOLLAR', ref('IDENTIFIER_START_NO_DOLLAR') |
-        ref('DIGIT'));
+        if(value[0].value == value[2].value) {
+          if(value[0].value == '"' || value[0].value == "'") {
+            assert(value[1] is List);
+            var values = value[1];
 
-    def('IDENTIFIER_PART', ref('IDENTIFIER_START') | ref('DIGIT'));
+            // TODO: should make darn sure all the children are chars, right?
+            assert(values .every((f) => f is String));
 
-    def('IDENTIFIER_NO_DOLLAR', ref('IDENTIFIER_START_NO_DOLLAR') &
-        ref('IDENTIFIER_PART_NO_DOLLAR').star());
+            return values.join();
+          }
+        }
+      }
+      return value;
+    });
 
-    def('IDENTIFIER', ref('IDENTIFIER_START') & ref('IDENTIFIER_PART').star());
+    action('stringLiteral', (List value) {
+      assert(value.length >= 1);
 
-    def('EXPONENT', (char('e') | char('E')) &
-        (ref('pluz') | ref('minus')).optional() &
-        ref('DIGIT').plus());
+      if(value.every((e) => e is String)) {
+        return value.join();
+      }
 
-    def('NUMBER', ref('DIGIT').plus() & (ref('dot') &
-        ref('DIGIT').plus()).optional() & ref('EXPONENT').optional() |
-        ref('dot') & ref('DIGIT').plus() & ref('EXPONENT').optional());
+      return value;
+    });
 
+    action('nullLiteral', (Token value) {
+      assert(value.value == 'null');
+      return null;
+    });
+
+    action('booleanLiteral', (Token value) {
+      switch(value.value) {
+        case 'true':
+          return true;
+        case 'false':
+          return false;
+        default:
+          throw 'boo! $token.value';
+      }
+    });
+
+    action('numericLiteral', (value) {
+      print(value);
+      try {
+        return int.parse(value);
+      } on FormatException catch (e) {
+        return double.parse(value);
+      }
+    });
   }
+
+}
+
+
+typedef dynamic ExpressionEvaluator(InlineExpression exp);
+
+class LiteralExpression implements InlineExpression {
+  final dynamic value;
+
+  LiteralExpression._internal(String expression, this.value) :
+    super(expression);
+}
+
+class InlineExpression {
+  final String expression;
+
+  InlineExpression(this.expression) {
+    assert(dartExpression.accept(expression));
+  }
+
+  String toString() => 'InlineExpression: $expression';
+
+  static ExpressionEvaluator getEvaluatorFromMap(Map<String, String> map) {
+    requireArgumentNotNull(map, 'map');
+
+    map.keys.forEach((String k) {
+      if(!dartIdentifier.accept(k)) {
+        throw new ArgumentError('Provided key "$k" is not a valid identifier');
+      }
+    });
+
+    final reservedIntersect = map.keys.toSet().intersection(_reservedValues);
+    if(!reservedIntersect.isEmpty) {
+      throw new ArgumentError('map contains reserved values: ' +
+          reservedIntersect.join(', '));
+    }
+
+    final eval = (String expression) {
+      if(map.containsKey(expression)) {
+        return map[expression];
+      }
+      throw 'could not find "$expression"';
+    };
+
+    return (InlineExpression val) => evaluate(val.expression, eval);
+  }
+
+  static dynamic evaluate(String expression, [dynamic lookup(String val)]) {
+    final result = dartExpression.parse(expression);
+
+    if(result.isSuccess) {
+      return result.value;
+    } else {
+      print([result, result.value, result.result, result.message]);
+    }
+
+    if(lookup != null) {
+      return lookup(expression);
+    }
+
+    throw 'Could not evaluate expression "${expression}"';
+  }
+
+  static final _reservedValues = ['true', 'false'].toSet();
 }
