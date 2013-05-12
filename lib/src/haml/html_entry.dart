@@ -84,7 +84,13 @@ class StringExpressionEntry implements HtmlEntry {
           ' StringExpressionEntry');
     }
 
-    sink.add(eval(expression));
+    var stringValue = eval(expression).toString();
+
+    if(escapeFlag == true) {
+      stringValue = _htmlEscape(stringValue);
+    }
+
+    sink.add(stringValue);
     if(next != null) {
       sink.add('\n');
     }
@@ -363,3 +369,21 @@ class DocTypeEntry implements HtmlEntry {
      }
   }
 }
+
+/*
+ * Copied from pub 'intl' package. Can't wait for this to get standardized
+ * ...somewhere
+ */
+String _htmlEscape(String text) {
+ // TODO(alanknight): This is copied into here directly to avoid having a
+ // dependency on the htmlescape library, which is difficult to do in a way
+ // that's compatible with both package: links and direct links in the SDK.
+ // Once pub is used in test.dart (Issue #4968) this should be removed.
+ // TODO(efortuna): A more efficient implementation.
+ return text.replaceAll("&", "&amp;")
+     .replaceAll("<", "&lt;")
+     .replaceAll(">", "&gt;")
+     .replaceAll('"', "&quot;")
+     .replaceAll("'", "&apos;");
+}
+
