@@ -75,7 +75,7 @@ class HamlEntityGrammar extends CompositeParser {
     // Dart expressions
     //
 
-    def('dart-expression', dart.dartExpression);
+    def('dart-expression', dart.DartParser.expression);
 
     //
     // HTML attributes  ( a = 'b' ...)
@@ -281,18 +281,20 @@ class HamlEntityParser extends HamlEntityGrammar {
 
       if(escapeFlag == null) {
         escapeVal = null;
-      } else if(escapeFlag == _alwaysEscapePrefix) {
+      } else if(escapeFlag == HamlEntityGrammar._alwaysEscapePrefix) {
         escapeVal = true;
-      } else if(escapeFlag == _neverEscapePrefx) {
+      } else if(escapeFlag == HamlEntityGrammar._neverEscapePrefx) {
         escapeVal = false;
       } else {
         throw 'Invalid escape flag "$escapeFlag"';
       }
 
-      final val = value[0];
+      final val = value[1];
       assert(val != null);
 
-      throw 'evaluate is not finished...';
+      var expression = new dart.InlineExpression(val);
+
+      return new StringExpressionEntry(expression, escapeVal);
     });
 
     action('silent-comment', (String value) {

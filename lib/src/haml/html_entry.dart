@@ -65,6 +65,35 @@ class OneLineMarkupComment implements HtmlEntry {
   }
 }
 
+/**
+ * An [escapeFlag] value of [null] implies the parser setting should be used.
+ */
+class StringExpressionEntry implements HtmlEntry {
+  final dart.InlineExpression expression;
+  final bool escapeFlag;
+
+  StringExpressionEntry(this.expression, this.escapeFlag) {
+    assert(expression != null);
+  }
+
+  @override
+  void write(HamlFormat format, EventSink<String> sink, Entry next,
+             dart.ExpressionEvaluator eval) {
+    if(next is EntryIndent) {
+      throw new HamlError('Cannot add nested content under a '
+          ' StringExpressionEntry');
+    }
+
+    sink.add(eval(expression));
+    if(next != null) {
+      sink.add('\n');
+    }
+  }
+
+  @override
+  String toString() => expression.toString();
+}
+
 class StringEntry implements HtmlEntry {
   final String value;
 
@@ -240,7 +269,7 @@ class ElementEntry implements HtmlEntry {
       // just let it pass through
       return input;
     } else {
-      throw 'not supported!';
+      throw 'Value not supported: $input';
     }
   }
 

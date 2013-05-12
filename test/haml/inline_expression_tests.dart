@@ -4,8 +4,8 @@ void _registerInlineExpressionTests() {
   group('evaluate', () {
     EXPRESSIONS.forEach((k, v) {
       test(k, () {
-        var result = dart.InlineExpression.evaluate(k);
-        expect(result, equals(v));
+        var result = new dart.InlineExpression(k);
+        expect(result.value, equals(v));
       });
     });
   });

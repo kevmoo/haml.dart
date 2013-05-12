@@ -6,14 +6,16 @@ import 'package:petitparser/dart.dart';
 
 final _parserInstance = new DartParser();
 
-final Parser dartExpression = _parserInstance['simple-expression'];
-final Parser dartIdentifier = _parserInstance['identifier'];
 
 class DartParser extends DartGrammar {
+  static final Parser identifier = _parserInstance['identifier'];
+
+  static final Parser expression = _parserInstance['simple-expression'];
+
   void initialize() {
     super.initialize();
 
-    def('simple-expression', ref('literal'));
+    def('simple-expression', ref('literal') | ref('identifier'));
 
     redef('numericLiteral', (parser) => parser.flatten());
 
@@ -27,7 +29,7 @@ class DartParser extends DartGrammar {
             assert(value[1] is List);
             var values = value[1];
 
-            // TODO: should make darn sure all the children are chars, right?
+            // TODO: should make darn sure all the children are Strings, right?
             assert(values .every((f) => f is String));
 
             return values.join();
@@ -47,6 +49,10 @@ class DartParser extends DartGrammar {
       return value;
     });
 
+    action('literal', (dynamic literal) {
+      return new LiteralExpression(literal);
+    });
+
     action('nullLiteral', (Token value) {
       assert(value.value == 'null');
       return null;
@@ -64,12 +70,16 @@ class DartParser extends DartGrammar {
     });
 
     action('numericLiteral', (value) {
-      print(value);
       try {
         return int.parse(value);
       } on FormatException catch (e) {
         return double.parse(value);
       }
+    });
+
+    action('identifier', (Token value) {
+      print('identifier: $value');
+      return new IdentifierExpression(value.value);
     });
   }
 
@@ -78,27 +88,47 @@ class DartParser extends DartGrammar {
 
 typedef dynamic ExpressionEvaluator(InlineExpression exp);
 
+class IdentifierExpression implements InlineExpression {
+  final String identifier;
+
+  IdentifierExpression(this.identifier);
+
+  dynamic evaluate(dynamic expressionEvaler(String expressior)) {
+    return expressionEvaler(identifier);
+  }
+}
+
 class LiteralExpression implements InlineExpression {
   final dynamic value;
 
-  LiteralExpression._internal(String expression, this.value) :
-    super(expression);
-}
-
-class InlineExpression {
-  final String expression;
-
-  InlineExpression(this.expression) {
-    assert(dartExpression.accept(expression));
+  LiteralExpression(this.value) {
+    assert(value is String ||
+        value is bool ||
+        value is num ||
+        value == null);
   }
 
-  String toString() => 'InlineExpression: $expression';
+  dynamic evaluate(dynamic expressionEvaler(String expressior)) {
+    return value;
+  }
+}
+
+abstract class InlineExpression {
+
+  factory InlineExpression(String source) {
+    var result = DartParser.expression.parse(source);
+    if(result.isSuccess) {
+      return result.value;
+    } else {
+      throw result;
+    }
+  }
 
   static ExpressionEvaluator getEvaluatorFromMap(Map<String, String> map) {
     requireArgumentNotNull(map, 'map');
 
     map.keys.forEach((String k) {
-      if(!dartIdentifier.accept(k)) {
+      if(!DartParser.identifier.accept(k)) {
         throw new ArgumentError('Provided key "$k" is not a valid identifier');
       }
     });
@@ -116,24 +146,10 @@ class InlineExpression {
       throw 'could not find "$expression"';
     };
 
-    return (InlineExpression val) => evaluate(val.expression, eval);
+    return (InlineExpression val) => val.evaluate(eval);
   }
 
-  static dynamic evaluate(String expression, [dynamic lookup(String val)]) {
-    final result = dartExpression.parse(expression);
-
-    if(result.isSuccess) {
-      return result.value;
-    } else {
-      print([result, result.value, result.result, result.message]);
-    }
-
-    if(lookup != null) {
-      return lookup(expression);
-    }
-
-    throw 'Could not evaluate expression "${expression}"';
-  }
+  dynamic evaluate(dynamic expressionEvaler(String expressior));
 
   static final _reservedValues = ['true', 'false'].toSet();
 }

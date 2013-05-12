@@ -3,7 +3,7 @@ library test.dart_grammar;
 import 'package:unittest/unittest.dart';
 import 'package:haml/dart_grammar.dart';
 
-final _grammar = new DartGrammar();
+final _grammar = new DartParser();
 
 void main() {
 
