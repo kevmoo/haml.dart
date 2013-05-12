@@ -1,3 +1,0 @@
-[submodule "resource/haml-spec"]
-	path = resource/haml-spec
-  url=https://github.com/kevmoo/haml-spec
