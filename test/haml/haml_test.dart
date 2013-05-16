@@ -3,6 +3,7 @@ library test.haml;
 import 'package:unittest/unittest.dart';
 import 'package:haml/core.dart';
 import 'package:haml/haml.dart';
+import 'package:haml/html.dart';
 import 'package:haml/dart_grammar.dart' as dart;
 import '../test_shared.dart';
 

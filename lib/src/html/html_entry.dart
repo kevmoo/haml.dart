@@ -1,4 +1,4 @@
-part of haml;
+part of html;
 
 abstract class HtmlEntry implements EntryValue {
 
@@ -100,10 +100,10 @@ class StringExpressionEntry implements HtmlEntry {
   String toString() => expression.toString();
 }
 
-class StringEntry implements HtmlEntry {
+class StringElementEntry implements HtmlEntry {
   final String value;
 
-  StringEntry(this.value) {
+  StringElementEntry(this.value) {
     assert(value != null);
   }
 

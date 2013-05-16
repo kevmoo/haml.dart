@@ -1,4 +1,4 @@
-part of haml;
+part of html;
 
 class HamlFormat {
   static const HamlFormat HTML5 = const HamlFormat._internal('html5');

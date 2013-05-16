@@ -1,4 +1,4 @@
-part of haml;
+part of html;
 
 Walker<Entry, String> htmlEntryToHtml(
     {
