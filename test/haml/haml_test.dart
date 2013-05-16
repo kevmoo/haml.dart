@@ -73,7 +73,7 @@ void _doTest(_SpecData data) {
 class _SpecData {
   final String haml;
   final String html;
-  final HamlFormat format;
+  final HtmlFormat format;
   final bool escapeHtml;
   final Map<String, dynamic> locals;
 
@@ -102,7 +102,7 @@ class _SpecData {
     String format = configMap.remove('format');
     format = format == null ? 'html5' : format;
 
-    final hamlFormat = HamlFormat.parse(format);
+    final hamlFormat = HtmlFormat.parse(format);
 
     String escapeHtml = configMap.remove('escape_html');
     escapeHtml = escapeHtml == null ? 'false' : escapeHtml;

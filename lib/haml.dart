@@ -14,7 +14,7 @@ import 'package:haml/html.dart';
 part 'src/haml/haml_grammar_parser.dart';
 
 String hamlStringToHtml(String hamlString,
-                        { HamlFormat format: HamlFormat.HTML5,
+                        { HtmlFormat format: HtmlFormat.HTML5,
   dart.ExpressionEvaluator eval: null}) {
   return _hamlStringToHtmlLines(format: format, eval: eval)
       .single(hamlString)
@@ -30,7 +30,7 @@ Walker<String, Entry> hamlStringToHtmlEntry() {
 }
 
 Walker<String, String> _hamlStringToHtmlLines(
-    { HamlFormat format: HamlFormat.HTML5, dart.ExpressionEvaluator eval: null}) {
+    { HtmlFormat format: HtmlFormat.HTML5, dart.ExpressionEvaluator eval: null}) {
   return hamlStringToHtmlEntry()
       .chain(htmlEntryToHtml(format: format, eval: eval));
 }

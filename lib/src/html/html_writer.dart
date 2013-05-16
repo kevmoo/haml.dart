@@ -2,7 +2,7 @@ part of html;
 
 Walker<Entry, String> htmlEntryToHtml(
     {
-      HamlFormat format: HamlFormat.HTML5,
+      HtmlFormat format: HtmlFormat.HTML5,
       dart.ExpressionEvaluator eval: null
       }) {
 

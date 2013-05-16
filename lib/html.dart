@@ -11,20 +11,20 @@ import 'package:haml/core.dart';
 import 'package:haml/dart_grammar.dart' as dart;
 
 part 'src/html/html_writer.dart';
-part 'src/html/haml_format.dart';
+part 'src/html/html_format.dart';
 part 'src/html/html_entry.dart';
 
 logging.Logger _getLogger(String name) {
   return new logging.Logger(name);
 }
 
-class HamlError implements Error {
+class HtmlError implements Error {
   final String message;
 
-  HamlError(this.message) {
+  HtmlError(this.message) {
     requireArgumentNotNullOrEmpty(message, 'message');
   }
 
   @override
-  String toString() => 'HamlError: $message';
+  String toString() => 'HtmlError: $message';
 }
