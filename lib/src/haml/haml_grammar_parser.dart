@@ -266,7 +266,7 @@ class HamlEntityParser extends HamlEntityGrammar {
     });
 
     action('text', (String value) {
-      return new StringEntry(value);
+      return new StringElementEntry(value);
     });
 
     action('markup-comment-one-line', (String value) {
