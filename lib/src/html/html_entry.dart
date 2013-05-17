@@ -13,7 +13,6 @@ abstract class HtmlEntry implements EntryValue {
                          Entry current, Entry next,
                          dart.ExpressionEvaluator eval) {
     if(current is HtmlEntry) {
-      // NOTE: this should be fine. Editor type analysis fail
       current.write(format, sink, next, eval);
     } else {
       throw 'not sure what to do here...';
@@ -23,7 +22,6 @@ abstract class HtmlEntry implements EntryValue {
   static void closeEntry(HtmlFormat format, EventSink<String> sink,
                          Entry current, Entry next) {
     if(current is HtmlEntry) {
-      // NOTE: this should be fine. Editor type analysis fail
       current.close(format, sink, next);
     } else {
       throw 'not supported?';
