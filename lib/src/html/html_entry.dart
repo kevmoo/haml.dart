@@ -29,7 +29,7 @@ abstract class HtmlEntry implements EntryValue {
   }
 }
 
-class SilentComment implements HtmlEntry {
+class SilentComment extends HtmlEntry {
   final String value;
 
   SilentComment(this.value);
@@ -38,13 +38,9 @@ class SilentComment implements HtmlEntry {
              dart.ExpressionEvaluator eval) {
     // noop!
   }
-
-  void close(HtmlFormat format, EventSink<String> sink, Entry next) {
-    // noop!
-  }
 }
 
-class OneLineMarkupComment implements HtmlEntry {
+class OneLineMarkupComment extends HtmlEntry {
   final String value;
 
   OneLineMarkupComment(this.value);
@@ -66,7 +62,7 @@ class OneLineMarkupComment implements HtmlEntry {
 /**
  * An [escapeFlag] value of [null] implies the parser setting should be used.
  */
-class StringExpressionEntry implements HtmlEntry {
+class StringExpressionEntry extends HtmlEntry {
   final dart.InlineExpression expression;
   final bool escapeFlag;
 
@@ -98,7 +94,7 @@ class StringExpressionEntry implements HtmlEntry {
   String toString() => expression.toString();
 }
 
-class StringElementEntry implements HtmlEntry {
+class StringElementEntry extends HtmlEntry {
   final String value;
 
   StringElementEntry(this.value) {
@@ -288,7 +284,7 @@ class ElementEntry implements HtmlEntry {
       .flatten();
 }
 
-class DocTypeEntry implements HtmlEntry {
+class DocTypeEntry extends HtmlEntry {
   final String label;
 
   DocTypeEntry([this.label]) {
