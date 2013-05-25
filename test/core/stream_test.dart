@@ -99,7 +99,7 @@ Stream<String> getRandomBlockStream(int rowCount) {
   var depth = null;
 
   Future.forEach(new Iterable.generate(rowCount, (e) => e), (i) {
-    return Timer.run(() {
+    return new Future(() {
       depth = _getDepth(depth);
       String value = 'line $i at depth $depth';
       for(var i = 0; i < depth; i++) {
