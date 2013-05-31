@@ -2,31 +2,51 @@ part of html;
 
 abstract class HtmlEntry implements EntryValue {
 
-  void write(HtmlFormat format, EventSink<String> sink, Entry next,
+  void write(HtmlFormat format, EventSink<String> sink, EntryType nextType,
              dart.ExpressionEvaluator eval);
 
-  void close(HtmlFormat format, EventSink<String> sink, Entry next) {
+  void close(HtmlFormat format, EventSink<String> sink, EntryType nextType) {
     throw 'not supported';
   }
 
   static void writeEntry(HtmlFormat format, EventSink<String> sink,
-                         Entry current, Entry next,
+                         Entry current, EntryType nextType,
                          dart.ExpressionEvaluator eval) {
     if(current is HtmlEntry) {
-      current.write(format, sink, next, eval);
+      current.write(format, sink, nextType, eval);
     } else {
       throw 'not sure what to do here...';
     }
   }
 
   static void closeEntry(HtmlFormat format, EventSink<String> sink,
-                         Entry current, Entry next) {
+                         Entry current, EntryType nextType) {
     if(current is HtmlEntry) {
-      current.close(format, sink, next);
+      current.close(format, sink, nextType);
     } else {
       throw 'not supported?';
     }
   }
+}
+
+abstract class SoloHtmlEntry extends HtmlEntry {
+
+  @override
+  void write(HtmlFormat format, EventSink<String> sink, EntryType nextType,
+             dart.ExpressionEvaluator eval) {
+    if(nextType == EntryType.INDENT) {
+      throw new HtmlError('Child content is not supported');
+    }
+
+    writeSolo(format, sink, eval);
+
+    if(nextType != EntryType.EOF) {
+      sink.add('\n');
+    }
+  }
+
+  void writeSolo(HtmlFormat format, EventSink<String> sink,
+                 dart.ExpressionEvaluator eval);
 }
 
 class SilentComment extends HtmlEntry {
@@ -34,35 +54,28 @@ class SilentComment extends HtmlEntry {
 
   SilentComment(this.value);
 
-  void write(HtmlFormat format, EventSink<String> sink, Entry next,
+  void write(HtmlFormat format, EventSink<String> sink, EntryType nextType,
              dart.ExpressionEvaluator eval) {
     // noop!
   }
 }
 
-class OneLineMarkupComment extends HtmlEntry {
+class OneLineMarkupComment extends SoloHtmlEntry {
   final String value;
 
   OneLineMarkupComment(this.value);
 
   @override
-  void write(HtmlFormat format, EventSink<String> sink, Entry next,
+  void writeSolo(HtmlFormat format, EventSink<String> sink,
              dart.ExpressionEvaluator eval) {
-    if(next is EntryIndent) {
-      throw 'not supported';
-    }
-
     sink.add('<!-- $value -->');
-    if(next != null) {
-      sink.add('\n');
-    }
   }
 }
 
 /**
  * An [escapeFlag] value of [null] implies the parser setting should be used.
  */
-class StringExpressionEntry extends HtmlEntry {
+class StringExpressionEntry extends SoloHtmlEntry {
   final dart.InlineExpression expression;
   final bool escapeFlag;
 
@@ -71,13 +84,8 @@ class StringExpressionEntry extends HtmlEntry {
   }
 
   @override
-  void write(HtmlFormat format, EventSink<String> sink, Entry next,
+  void writeSolo(HtmlFormat format, EventSink<String> sink,
              dart.ExpressionEvaluator eval) {
-    if(next is EntryIndent) {
-      throw new HtmlError('Cannot add nested content under a '
-          ' StringExpressionEntry');
-    }
-
     var stringValue = eval(expression).toString();
 
     if(escapeFlag == true) {
@@ -85,16 +93,13 @@ class StringExpressionEntry extends HtmlEntry {
     }
 
     sink.add(stringValue);
-    if(next != null) {
-      sink.add('\n');
-    }
   }
 
   @override
   String toString() => expression.toString();
 }
 
-class StringElementEntry extends HtmlEntry {
+class StringElementEntry extends SoloHtmlEntry {
   final String value;
 
   StringElementEntry(this.value) {
@@ -102,17 +107,9 @@ class StringElementEntry extends HtmlEntry {
   }
 
   @override
-  void write(HtmlFormat format, EventSink<String> sink, Entry next,
+  void writeSolo(HtmlFormat format, EventSink<String> sink,
              dart.ExpressionEvaluator eval) {
-    if(next is EntryIndent) {
-      throw new HtmlError('Cannot add nested content under a StringEntry: '
-          '"$value"');
-    }
-
     sink.add(value);
-    if(next != null) {
-      sink.add('\n');
-    }
   }
 
   @override
@@ -126,21 +123,16 @@ class ElementEntryWithSimpleContent extends ElementEntry {
                                 this.content) : super(name, attributes);
 
   @override
-  void write(HtmlFormat format, EventSink<String> sink, Entry next,
+  void write(HtmlFormat format, EventSink<String> sink, EntryType nextType,
              dart.ExpressionEvaluator eval) {
-    if(next is EntryIndent) {
+    if(nextType == EntryType.INDENT) {
       throw new HtmlError('The parent element "$name" already has content.');
     }
 
     sink.add("<${name}${_getAttributeString(format, eval)}>$content</${name}>");
-    if(next != null) {
+    if(nextType != EntryType.EOF) {
       sink.add('\n');
     }
-  }
-
-  @override
-  void close(HtmlFormat format, EventSink<String> sink, Entry next) {
-    throw 'not supported';
   }
 }
 
@@ -164,10 +156,10 @@ class ElementEntry implements HtmlEntry {
   String toString() => '<$name>';
 
   @override
-  void write(HtmlFormat format, EventSink<String> sink, Entry next,
+  void write(HtmlFormat format, EventSink<String> sink, EntryType nextType,
              dart.ExpressionEvaluator eval) {
     sink.add("<${name}${_getAttributeString(format, eval)}");
-    if(next is EntryIndent) {
+    if(nextType == EntryType.INDENT) {
       // close out the tag with a newline
       sink.add(">\n");
     } else {
@@ -190,16 +182,16 @@ class ElementEntry implements HtmlEntry {
             throw 'have not got around to $format yet';
         }
       }
-      if(next != null) {
+      if(nextType != EntryType.EOF) {
         sink.add('\n');
       }
     }
   }
 
   @override
-  void close(HtmlFormat format, EventSink<String> sink, Entry next) {
+  void close(HtmlFormat format, EventSink<String> sink, EntryType nextType) {
     sink.add("</${value}>");
-    if(next != null) {
+    if(nextType != EntryType.EOF) {
       sink.add('\n');
     }
   }
@@ -306,9 +298,9 @@ class DocTypeEntry extends HtmlEntry {
   }
 
   @override
-  void write(HtmlFormat format, EventSink<String> sink, Entry next,
+  void write(HtmlFormat format, EventSink<String> sink, EntryType nextType,
              dart.ExpressionEvaluator eval) {
-    assert(next is! EntryIndent);
+    assert(nextType != EntryType.INDENT);
     sink.add(formatLabel(format));
 
     // TODO: if next != null, write newline?

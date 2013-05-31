@@ -1,5 +1,25 @@
 part of html;
 
+class EntryType {
+  final String name;
+
+  const EntryType._internal(this.name);
+
+  static const EntryType OTHER = const EntryType._internal('other');
+  static const EntryType INDENT = const EntryType._internal('indent');
+  static const EntryType EOF = const EntryType._internal('end-of-file');
+
+  static EntryType of(Entry value) {
+    if(value == null) {
+      return EntryType.EOF;
+    } else if(value is EntryIndent) {
+      return EntryType.INDENT;
+    } else {
+      return EntryType.OTHER;
+    }
+  }
+}
+
 Walker<Entry, String> htmlEntryToHtml(
     {
       HtmlFormat format: HtmlFormat.HTML5,
@@ -19,7 +39,7 @@ Walker<Entry, String> htmlEntryToHtml(
 
   final List<HtmlEntry> levels = new List<HtmlEntry>();
 
-  void lookAhead(EventSink<String> sink, Entry current, Entry next) {
+  void lookAhead(EventSink<String> sink, Entry current, EntryType nextType) {
     assert(sink != null);
     assert(current != null);
 
@@ -34,14 +54,14 @@ Walker<Entry, String> htmlEntryToHtml(
         sink.add(indentChar);
       }
 
-      HtmlEntry.closeEntry(format, sink, lastLevel, next);
+      HtmlEntry.closeEntry(format, sink, lastLevel, nextType);
     } else {
 
       for(int i = 0; i < (indentCount * levels.length); i++) {
         sink.add(indentChar);
       }
 
-      HtmlEntry.writeEntry(format, sink, current, next, eval);
+      HtmlEntry.writeEntry(format, sink, current, nextType, eval);
     }
   }
 
@@ -54,14 +74,14 @@ Walker<Entry, String> htmlEntryToHtml(
         if(previous == null) {
           previous = data;
         } else {
-          lookAhead(sink, previous, data);
+          lookAhead(sink, previous, EntryType.of(data));
           previous = data;
         }
       },
       handleDone: (EventSink<String> sink) {
         assert(levels.length <= 1);
         if(previous != null) {
-          lookAhead(sink, previous, null);
+          lookAhead(sink, previous, EntryType.of(null));
           previous = null;
         } else {
           assert(levels.isEmpty);
