@@ -18,7 +18,7 @@ void main() {
   //
   // Analyzer
   //
-  addTask('analyze_libs', createDartAnalyzerTask(_getLibs));
+  addTask('analyze_libs', createAnalyzerTask(_getLibs));
 
   runHop();
 }

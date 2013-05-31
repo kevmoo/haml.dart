@@ -25,6 +25,7 @@ class EntryUndent extends EntryDent {
 }
 
 abstract class EntryValue implements Entry {
+  String get value;
 }
 
 class StringEntry implements EntryValue {

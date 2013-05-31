@@ -302,7 +302,7 @@ class HamlEntityParser extends HamlEntityGrammar {
     });
   }
 
-  static Map<String, dynamic> _parseClassesAndIds(List<String> source) {
+  static Map<String, dynamic> _parseClassesAndIds(List<List<String>> source) {
     Map<String, dynamic> values = { };
 
     source.forEach((List<String> content) {
