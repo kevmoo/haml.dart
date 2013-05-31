@@ -54,7 +54,7 @@ Walker<Entry, String> htmlEntryToHtml(
         sink.add(indentChar);
       }
 
-      HtmlEntry.closeEntry(format, sink, lastLevel, nextType);
+      HtmlEntry.closeEntry(format, sink, lastLevel, nextType == EntryType.EOF);
     } else {
 
       for(int i = 0; i < (indentCount * levels.length); i++) {

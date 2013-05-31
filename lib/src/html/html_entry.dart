@@ -5,7 +5,7 @@ abstract class HtmlEntry implements EntryValue {
   void write(HtmlFormat format, EventSink<String> sink, EntryType nextType,
              dart.ExpressionEvaluator eval);
 
-  void close(HtmlFormat format, EventSink<String> sink, EntryType nextType) {
+  void close(HtmlFormat format, EventSink<String> sink, bool isEOF) {
     throw 'not supported';
   }
 
@@ -20,9 +20,9 @@ abstract class HtmlEntry implements EntryValue {
   }
 
   static void closeEntry(HtmlFormat format, EventSink<String> sink,
-                         Entry current, EntryType nextType) {
+                         Entry current, bool nextIsEOF) {
     if(current is HtmlEntry) {
-      current.close(format, sink, nextType);
+      current.close(format, sink, nextIsEOF);
     } else {
       throw 'not supported?';
     }
@@ -189,9 +189,9 @@ class ElementEntry implements HtmlEntry {
   }
 
   @override
-  void close(HtmlFormat format, EventSink<String> sink, EntryType nextType) {
+  void close(HtmlFormat format, EventSink<String> sink, bool isEOF) {
     sink.add("</${value}>");
-    if(nextType != EntryType.EOF) {
+    if(!isEOF) {
       sink.add('\n');
     }
   }
