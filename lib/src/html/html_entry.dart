@@ -367,6 +367,7 @@ class DocTypeEntry extends HtmlEntry {
 /*
  * Copied from pub 'intl' package. Can't wait for this to get standardized
  * ...somewhere
+ * DARTBUG: https://code.google.com/p/dart/issues/detail?id=1657
  */
 String _htmlEscape(String text) {
  // TODO(alanknight): This is copied into here directly to avoid having a
