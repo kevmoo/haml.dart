@@ -8,7 +8,7 @@ environment:
 dependencies:
   bot: '>=0.20.1'
   bot_io: '>=0.21.0+2'
-  js: '>=0.0.22'
+  js: '>=0.0.22 <0.3.0'
   logging: '>=0.4.5+1'
   meta: '>=0.4.5+1'
   pathos: '>=0.4.5+1'
